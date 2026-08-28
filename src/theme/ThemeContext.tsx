@@ -41,7 +41,7 @@ export function ThemeProvider({
 }) {
   const systemScheme = useColorScheme();
   const [mode, setModeState] = useState<ThemeMode>(initialMode ?? 'system');
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(Boolean(initialMode));
 
   useEffect(() => {
     if (initialMode) {

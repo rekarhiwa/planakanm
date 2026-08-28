@@ -83,12 +83,14 @@ export const radius = {
   full: 999,
 } as const;
 
+import { FONT_FAMILY } from './fonts';
+
 export const typography = {
-  display: { fontSize: 32, fontWeight: '800' as const },
-  title: { fontSize: 20, fontWeight: '700' as const },
-  body: { fontSize: 16, fontWeight: '400' as const },
-  caption: { fontSize: 13, fontWeight: '400' as const },
-  label: { fontSize: 15, fontWeight: '600' as const },
+  display: { fontFamily: FONT_FAMILY, fontSize: 32 },
+  title: { fontFamily: FONT_FAMILY, fontSize: 20 },
+  body: { fontFamily: FONT_FAMILY, fontSize: 16 },
+  caption: { fontFamily: FONT_FAMILY, fontSize: 13 },
+  label: { fontFamily: FONT_FAMILY, fontSize: 15 },
 };
 
 export const motion = {

@@ -5,8 +5,9 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import type { PlanPriority, RepeatType, ReminderType } from '../domain/entities/types';
 import { parseNaturalLanguage, parsedToCreateInput } from '../domain/services/nlpParser';
-import { getTodayISO, getTomorrowISO } from '../utils/dates';
+import { getTodayISO, getTomorrowISO, formatTime24 } from '../utils/dates';
 import { Chip } from './Chip';
+import { getDefaultTimeValue, TimePicker } from './TimePicker';
 import { radius, spacing, typography } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { usePlanStore } from '../stores/planStore';
@@ -69,7 +70,7 @@ export function QuickCreateSheet({ visible, onClose }: QuickCreateSheetProps) {
       input = {
         title: title.trim(),
         date,
-        time: hasTime ? time : undefined,
+        time: hasTime && time ? formatTime24(time) : undefined,
         hasTime,
         repeatType,
         priority,
@@ -124,24 +125,26 @@ export function QuickCreateSheet({ visible, onClose }: QuickCreateSheetProps) {
         </View>
 
         <Pressable
-          onPress={() => setHasTime(!hasTime)}
-          style={[styles.timeToggle, { borderColor: colors.border }]}
+          onPress={() => {
+            if (!hasTime) {
+              setTime(getDefaultTimeValue());
+            }
+            setHasTime(!hasTime);
+          }}
+          style={[
+            styles.timeToggle,
+            {
+              borderColor: hasTime ? colors.primary : colors.border,
+              backgroundColor: hasTime ? colors.nowHighlight : colors.surface,
+            },
+          ]}
         >
-          <Text style={{ color: hasTime ? colors.primary : colors.textSecondary }}>
-            {t('create.setTime')}
+          <Text style={{ color: hasTime ? colors.primary : colors.textSecondary, ...typography.label }}>
+            {hasTime && time ? `⏰ ${time}` : t('create.setTime')}
           </Text>
         </Pressable>
 
-        {hasTime && (
-          <BottomSheetTextInput
-            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.background }]}
-            placeholder="20:00"
-            placeholderTextColor={colors.textSecondary}
-            value={time}
-            onChangeText={setTime}
-            keyboardType="numbers-and-punctuation"
-          />
-        )}
+        {hasTime && <TimePicker value={time || getDefaultTimeValue()} onChange={setTime} />}
 
         <Pressable onPress={() => setShowAdvanced(!showAdvanced)}>
           <Text style={[styles.advancedToggle, { color: colors.primary }]}>

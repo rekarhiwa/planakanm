@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Chip } from '../components/Chip';
 import { exportPlans, importPlans } from '../data/exportImport';
-import { requestNotificationPermissions } from '../notifications/scheduler';
+import { requestAppPermissions } from '../permissions';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useTheme } from '../theme/ThemeContext';
 import type { ThemeMode } from '../theme/colors';
@@ -14,7 +14,9 @@ import type { AppLanguage } from '../i18n';
 export function SettingsScreen() {
   const { colors, mode, setMode } = useTheme();
   const { t } = useTranslation();
-  const { settings, setLanguage, updateSettings } = useSettingsStore();
+  const settings = useSettingsStore((s) => s.settings);
+  const setLanguage = useSettingsStore((s) => s.setLanguage);
+  const updateSettings = useSettingsStore((s) => s.updateSettings);
 
   const handleExport = async () => {
     try {
@@ -34,8 +36,8 @@ export function SettingsScreen() {
   };
 
   const handleNotifications = async () => {
-    const granted = await requestNotificationPermissions();
-    await updateSettings({ notificationsEnabled: granted });
+    await requestAppPermissions({ force: true });
+    await updateSettings({ notificationsEnabled: true });
   };
 
   return (

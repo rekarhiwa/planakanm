@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { requestNotificationPermissions } from '../notifications/scheduler';
+import { requestAppPermissions } from '../permissions';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { radius, spacing, typography } from '../theme/colors';
@@ -26,7 +26,7 @@ export function OnboardingScreen() {
 
   const handleNext = async () => {
     if (isLast) {
-      await requestNotificationPermissions();
+      await requestAppPermissions({ force: true });
       await updateSettings({ onboardingComplete: true });
       setShowOnboarding(false);
     } else {

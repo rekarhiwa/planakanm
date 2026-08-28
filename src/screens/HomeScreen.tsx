@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,9 +16,9 @@ import { QuickCreateSheet } from '../components/QuickCreateSheet';
 import { SectionHeader } from '../components/SectionHeader';
 import { SnoozePicker } from '../components/SnoozePicker';
 import { UndoSnackbar } from '../components/UndoSnackbar';
-import type { RootStackParamList } from '../app/navigation';
+import type { RootStackParamList } from '../navigation';
 import type { Plan } from '../domain/entities/types';
-import { usePlanStore } from '../stores/planStore';
+import { filterPlans, usePlanStore } from '../stores/planStore';
 import { useUIStore } from '../stores/uiStore';
 import { spacing, typography } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
@@ -29,7 +29,13 @@ export function HomeScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const plans = usePlanStore((s) => s.getFilteredPlans());
+  const rawPlans = usePlanStore((s) => s.plans);
+  const filter = usePlanStore((s) => s.filter);
+  const searchQuery = usePlanStore((s) => s.searchQuery);
+  const plans = useMemo(
+    () => filterPlans(rawPlans, filter, searchQuery),
+    [rawPlans, filter, searchQuery],
+  );
   const selectedDate = usePlanStore((s) => s.selectedDate);
   const setSelectedDate = usePlanStore((s) => s.setSelectedDate);
   const loadPlansForDate = usePlanStore((s) => s.loadPlansForDate);
@@ -40,31 +46,34 @@ export function HomeScreen() {
   const checkOverdue = usePlanStore((s) => s.checkOverdue);
   const isLoading = usePlanStore((s) => s.isLoading);
 
-  const {
-    showQuickCreate,
-    openQuickCreate,
-    closeQuickCreate,
-    showSnoozeSheet,
-    snoozePlanId,
-    openSnooze,
-    closeSnooze,
-    showOverdueDialog,
-    overduePlans,
-    setOverdueDialog,
-    showUndoSnackbar,
-    undoMessage,
-    showUndo,
-    hideUndo,
-  } = useUIStore();
+  const showQuickCreate = useUIStore((s) => s.showQuickCreate);
+  const openQuickCreate = useUIStore((s) => s.openQuickCreate);
+  const closeQuickCreate = useUIStore((s) => s.closeQuickCreate);
+  const showSnoozeSheet = useUIStore((s) => s.showSnoozeSheet);
+  const snoozePlanId = useUIStore((s) => s.snoozePlanId);
+  const openSnooze = useUIStore((s) => s.openSnooze);
+  const closeSnooze = useUIStore((s) => s.closeSnooze);
+  const showOverdueDialog = useUIStore((s) => s.showOverdueDialog);
+  const overduePlans = useUIStore((s) => s.overduePlans);
+  const setOverdueDialog = useUIStore((s) => s.setOverdueDialog);
+  const showUndoSnackbar = useUIStore((s) => s.showUndoSnackbar);
+  const undoMessage = useUIStore((s) => s.undoMessage);
+  const showUndo = useUIStore((s) => s.showUndo);
+  const hideUndo = useUIStore((s) => s.hideUndo);
+
+  const overduePrompted = useRef(false);
 
   useEffect(() => {
     loadPlansForDate(selectedDate);
+    if (overduePrompted.current) return;
+
     checkOverdue().then((overdue) => {
       if (overdue.length > 0) {
+        overduePrompted.current = true;
         setOverdueDialog(true, overdue.map((p) => p.id));
       }
     });
-  }, [selectedDate]);
+  }, [selectedDate, loadPlansForDate, checkOverdue, setOverdueDialog]);
 
   const greeting = t(`greeting.${getGreetingKey()}`);
   const pendingCount = plans.filter((p) => p.status === 'pending' || p.status === 'overdue').length;

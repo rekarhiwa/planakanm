@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { RootStackParamList } from '../app/navigation';
+import type { RootStackParamList } from '../navigation';
 import type { Plan } from '../domain/entities/types';
 import * as planRepo from '../data/repositories/planRepository';
 import { usePlanStore } from '../stores/planStore';

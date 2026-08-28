@@ -8,6 +8,42 @@ import { snoozePlanByPreset } from '../domain/services/snoozeEngine';
 import { getTodayISO } from '../utils/dates';
 import { cancelPlanNotifications, schedulePlanNotification } from '../notifications/scheduler';
 
+export function filterPlans(
+  plans: Plan[],
+  filter: PlanStore['filter'],
+  searchQuery: string,
+): Plan[] {
+  let filtered = [...plans];
+
+  if (searchQuery) {
+    filtered = filtered.filter((p) =>
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }
+
+  switch (filter) {
+    case 'pending':
+      filtered = filtered.filter((p) => p.status === 'pending');
+      break;
+    case 'completed':
+      filtered = filtered.filter((p) => p.status === 'completed');
+      break;
+    case 'overdue':
+      filtered = filtered.filter((p) => p.status === 'overdue');
+      break;
+    case 'today':
+      filtered = filtered.filter((p) => p.date === getTodayISO());
+      break;
+    case 'upcoming':
+      filtered = filtered.filter(
+        (p) => p.date >= getTodayISO() && p.status === 'pending',
+      );
+      break;
+  }
+
+  return filtered;
+}
+
 interface PlanStore {
   plans: Plan[];
   selectedDate: string;
@@ -110,36 +146,8 @@ export const usePlanStore = create<PlanStore>((set, get) => ({
     return overdue;
   },
 
-  getFilteredPlans: () => {
-    const { plans, filter, searchQuery } = get();
-    let filtered = [...plans];
-
-    if (searchQuery) {
-      filtered = filtered.filter((p) =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-    }
-
-    switch (filter) {
-      case 'pending':
-        filtered = filtered.filter((p) => p.status === 'pending');
-        break;
-      case 'completed':
-        filtered = filtered.filter((p) => p.status === 'completed');
-        break;
-      case 'overdue':
-        filtered = filtered.filter((p) => p.status === 'overdue');
-        break;
-      case 'today':
-        filtered = filtered.filter((p) => p.date === getTodayISO());
-        break;
-      case 'upcoming':
-        filtered = filtered.filter(
-          (p) => p.date >= getTodayISO() && p.status === 'pending',
-        );
-        break;
-    }
-
-    return filtered;
-  },
+  getFilteredPlans: () => filterPlans(get().plans, get().filter, get().searchQuery),
 }));
+
+// Note: do not use getFilteredPlans() directly inside usePlanStore selectors.
+// It returns a new array each call and causes infinite re-renders.

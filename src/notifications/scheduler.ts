@@ -1,23 +1,46 @@
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import type { Plan } from '../domain/entities/types';
 import * as planRepo from '../data/repositories/planRepository';
 import { getScheduledDateTime } from '../utils/dates';
+import { areNotificationsAvailable } from './support';
+
+type NotificationsModule = typeof import('expo-notifications');
 
 const MAX_SCHEDULED = 60;
+const noopSubscription = { remove: () => {} };
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+let notificationsModule: NotificationsModule | null = null;
+
+async function loadNotifications(): Promise<NotificationsModule | null> {
+  if (!areNotificationsAvailable()) return null;
+  if (notificationsModule) return notificationsModule;
+
+  try {
+    notificationsModule = await import('expo-notifications');
+    notificationsModule.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
+    });
+    return notificationsModule;
+  } catch {
+    return null;
+  }
+}
+
+export async function initNotifications(): Promise<boolean> {
+  return (await loadNotifications()) !== null;
+}
 
 export async function setupNotificationChannels() {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return;
+
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('plan_reminders', {
       name: 'Plan Reminders',
@@ -45,6 +68,9 @@ export async function setupNotificationChannels() {
 }
 
 export async function requestNotificationPermissions(): Promise<boolean> {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return false;
+
   const { status: existing } = await Notifications.getPermissionsAsync();
   if (existing === 'granted') return true;
 
@@ -53,6 +79,8 @@ export async function requestNotificationPermissions(): Promise<boolean> {
 }
 
 export async function schedulePlanNotification(plan: Plan): Promise<string | null> {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return null;
   if (plan.status === 'completed' || plan.status === 'cancelled') return null;
   if (!plan.hasTime || !plan.time) return null;
 
@@ -82,6 +110,9 @@ export async function schedulePlanNotification(plan: Plan): Promise<string | nul
 }
 
 export async function scheduleOverdueNotification(plan: Plan): Promise<string | null> {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return null;
+
   const scheduled = getScheduledDateTime(plan);
   if (!scheduled) return null;
 
@@ -104,6 +135,9 @@ export async function scheduleOverdueNotification(plan: Plan): Promise<string | 
 }
 
 export async function cancelPlanNotifications(planId: string): Promise<void> {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return;
+
   const plan = await planRepo.getPlanById(planId);
   if (plan?.notificationId) {
     await Notifications.cancelScheduledNotificationAsync(plan.notificationId);
@@ -111,6 +145,9 @@ export async function cancelPlanNotifications(planId: string): Promise<void> {
 }
 
 export async function reconcileAllNotifications(): Promise<void> {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return;
+
   const allPlans = await planRepo.getAllActivePlans();
   const pending = allPlans.filter(
     (p) =>
@@ -128,9 +165,12 @@ export async function reconcileAllNotifications(): Promise<void> {
   }
 }
 
-export function addNotificationResponseListener(
+export async function addNotificationResponseListener(
   handler: (planId: string, action: string) => void,
 ) {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return noopSubscription;
+
   return Notifications.addNotificationResponseReceivedListener((response) => {
     const data = response.notification.request.content.data as {
       planId?: string;
@@ -142,9 +182,12 @@ export function addNotificationResponseListener(
   });
 }
 
-export function addNotificationReceivedListener(
+export async function addNotificationReceivedListener(
   handler: (planId: string, type: string) => void,
 ) {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return noopSubscription;
+
   return Notifications.addNotificationReceivedListener((notification) => {
     const data = notification.request.content.data as {
       planId?: string;
