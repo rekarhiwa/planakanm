@@ -1,0 +1,170 @@
+{
+  "app": {
+    "name": "خططي"
+  },
+  "tabs": {
+    "home": "الرئيسية",
+    "calendar": "التقويم",
+    "stats": "الإحصائيات",
+    "settings": "الإعدادات"
+  },
+  "greeting": {
+    "morning": "صباح الخير ☀️",
+    "afternoon": "مساء الخير 🌤",
+    "evening": "مساء الخير 🌙",
+    "night": "تصبح على خير 🌙"
+  },
+  "home": {
+    "remaining": "{{count}} خطط متبقية",
+    "now": "الآن",
+    "overdue": "متأخر",
+    "today": "اليوم",
+    "upcoming": "القادم",
+    "morning": "صباحاً",
+    "afternoon": "مساءً",
+    "noTime": "بدون وقت",
+    "newPlan": "خطة جديدة",
+    "emptyTitle": "لا توجد خطط 🎯",
+    "emptySubtitle": "حان الوقت لإضافة خطة.",
+    "completeNow": "تم",
+    "snoozeNow": "تأجيل"
+  },
+  "create": {
+    "title": "ماذا تريد أن تفعل؟",
+    "placeholder": "ما هي خطتك؟",
+    "today": "اليوم",
+    "tomorrow": "غداً",
+    "pickDate": "اختر تاريخ",
+    "setTime": "حدد الوقت",
+    "noRepeat": "بدون تكرار",
+    "daily": "يومياً",
+    "weekly": "أسبوعياً",
+    "monthly": "شهرياً",
+    "yearly": "سنوياً",
+    "addPlan": "إضافة الخطة",
+    "advanced": "المزيد",
+    "category": "الفئة",
+    "priority": "الأولوية",
+    "notes": "ملاحظات",
+    "reminderType": "نوع التذكير",
+    "notification": "إشعار",
+    "alarm": "منبه"
+  },
+  "snooze": {
+    "title": "متى نذكرك؟",
+    "overdueTitle": "خطتك متأخرة",
+    "missedQuestion": "لم تنفذ خطتك، متى نذكرك؟",
+    "5min": "5 دقائق",
+    "10min": "10 دقائق",
+    "15min": "15 دقيقة",
+    "30min": "30 دقيقة",
+    "1hour": "ساعة",
+    "2hours": "ساعتان",
+    "tomorrow": "غداً",
+    "custom": "وقت مخصص",
+    "doNow": "افعل الآن"
+  },
+  "status": {
+    "pending": "معلق",
+    "completed": "مكتمل",
+    "overdue": "متأخر",
+    "snoozed": "مؤجل",
+    "cancelled": "ملغى"
+  },
+  "priority": {
+    "low": "منخفض",
+    "normal": "عادي",
+    "high": "عالي",
+    "urgent": "عاجل"
+  },
+  "detail": {
+    "complete": "إكمال",
+    "edit": "تعديل",
+    "snooze": "تأجيل",
+    "reschedule": "إعادة جدولة",
+    "duplicate": "نسخ",
+    "delete": "حذف",
+    "history": "السجل",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "repeat": "التكرار",
+    "category": "الفئة",
+    "notes": "ملاحظات"
+  },
+  "calendar": {
+    "week": "أسبوع",
+    "month": "شهر",
+    "year": "سنة",
+    "thisWeek": "هذا الأسبوع",
+    "nextWeek": "الأسبوع القادم",
+    "plansCount": "{{count}} خطط"
+  },
+  "stats": {
+    "title": "الإحصائيات",
+    "today": "اليوم",
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر",
+    "completed": "مكتمل",
+    "completionRate": "معدل الإكمال",
+    "streak": "سلسلة",
+    "missed": "فائت",
+    "snoozed": "مؤجل",
+    "days": "أيام"
+  },
+  "search": {
+    "placeholder": "بحث...",
+    "noResults": "لا توجد نتائج"
+  },
+  "filters": {
+    "all": "الكل",
+    "pending": "معلق",
+    "completed": "مكتمل",
+    "overdue": "متأخر",
+    "today": "اليوم",
+    "upcoming": "القادم"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "themeSystem": "النظام",
+    "notifications": "الإشعارات",
+    "defaultReminder": "التذكير الافتراضي",
+    "defaultSnooze": "التأجيل الافتراضي",
+    "weekStart": "بداية الأسبوع",
+    "timeFormat": "تنسيق الوقت",
+    "export": "تصدير",
+    "import": "استيراد",
+    "about": "حول",
+    "version": "الإصدار"
+  },
+  "onboarding": {
+    "step1Title": "خطط ليومك",
+    "step1Desc": "أنشئ خططاً بسرعة لليوم أو الغد.",
+    "step2Title": "لا تنسَ أبداً",
+    "step2Desc": "اضبط تذكيرات ذكية لخططك.",
+    "step3Title": "تأجيل سريع",
+    "step3Desc": "فاتتك خطة؟ أعد جدولتها بنقرة واحدة.",
+    "getStarted": "ابدأ",
+    "allowNotifications": "السماح بالإشعارات"
+  },
+  "common": {
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "undo": "تراجع",
+    "deleted": "تم حذف الخطة",
+    "completed": "تم إكمال الخطة ✓",
+    "confirm": "تأكيد",
+    "loading": "جاري التحميل..."
+  },
+  "notification": {
+    "reminderTitle": "⏰ وقت «{{title}}»",
+    "overdueTitle": "⏰ فات وقت «{{title}}»",
+    "complete": "إكمال",
+    "snooze": "تأجيل",
+    "open": "فتح"
+  }
+}

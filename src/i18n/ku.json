@@ -1,0 +1,170 @@
+{
+  "app": {
+    "name": "پلانەکانم"
+  },
+  "tabs": {
+    "home": "سەرەکی",
+    "calendar": "ڕۆژژمێر",
+    "stats": "ئامار",
+    "settings": "ڕێکخستن"
+  },
+  "greeting": {
+    "morning": "بەیانی باش ☀️",
+    "afternoon": "ڕۆژ باش 🌤",
+    "evening": "ئێوارە باش 🌙",
+    "night": "شەو باش 🌙"
+  },
+  "home": {
+    "remaining": "{{count}} پلان ماوە",
+    "now": "ئێستا",
+    "overdue": "دواکەوتوو",
+    "today": "ئەمڕۆ",
+    "upcoming": "داهاتوو",
+    "morning": "بەیانی",
+    "afternoon": "ئێوارە",
+    "noTime": "بێ کات",
+    "newPlan": "پلانێکی نوێ",
+    "emptyTitle": "هیچ پلانێکت نییە 🎯",
+    "emptySubtitle": "کاتی باشە بۆ دانانی یەک پلان.",
+    "completeNow": "تەواو کرا",
+    "snoozeNow": "دواخستن"
+  },
+  "create": {
+    "title": "چی دەتەوێت بکەیت؟",
+    "placeholder": "پلانەکەت چییە؟",
+    "today": "ئەمڕۆ",
+    "tomorrow": "سبەی",
+    "pickDate": "دیاری بکە",
+    "setTime": "کات دابنێ",
+    "noRepeat": "دووبارە مەکەوە",
+    "daily": "ڕۆژانە",
+    "weekly": "هەفتانە",
+    "monthly": "مانگانە",
+    "yearly": "ساڵانە",
+    "addPlan": "پلانەکە زیاد بکە",
+    "advanced": "زیاتر",
+    "category": "جۆر",
+    "priority": "گرنگی",
+    "notes": "تێبینی",
+    "reminderType": "جۆری بیرهێنان",
+    "notification": "ئاگاداری",
+    "alarm": "زەنگ"
+  },
+  "snooze": {
+    "title": "کەی بیرت بخەینەوە؟",
+    "overdueTitle": "پلانەکەت دواکەوتووە",
+    "missedQuestion": "ئەم پلانەت جێبەجێ نەکردووە، کەی بیرت بخەینەوە؟",
+    "5min": "٥ خولەک تر",
+    "10min": "١٠ خولەک تر",
+    "15min": "١٥ خولەک تر",
+    "30min": "٣٠ خولەک تر",
+    "1hour": "١ کاتژمێر تر",
+    "2hours": "٢ کاتژمێر تر",
+    "tomorrow": "سبەی",
+    "custom": "کاتی خۆم دیاری دەکەم",
+    "doNow": "ئێستا بکە"
+  },
+  "status": {
+    "pending": "چاوەڕوان",
+    "completed": "تەواو",
+    "overdue": "دواکەوتوو",
+    "snoozed": "دواخراو",
+    "cancelled": "هەڵوەشاو"
+  },
+  "priority": {
+    "low": "کەم",
+    "normal": "ئاسایی",
+    "high": "بەرز",
+    "urgent": "پەلە"
+  },
+  "detail": {
+    "complete": "تەواو بکە",
+    "edit": "دەستکاری",
+    "snooze": "دواخستن",
+    "reschedule": "دووبارە خشتە بکە",
+    "duplicate": "لەبەرگرتنەوە",
+    "delete": "سڕینەوە",
+    "history": "مێژوو",
+    "date": "بەروار",
+    "time": "کات",
+    "repeat": "دووبارەبوونەوە",
+    "category": "جۆر",
+    "notes": "تێبینی"
+  },
+  "calendar": {
+    "week": "هەفتە",
+    "month": "مانگ",
+    "year": "ساڵ",
+    "thisWeek": "ئەم هەفتەیە",
+    "nextWeek": "هەفتەی داهاتوو",
+    "plansCount": "{{count}} پلان"
+  },
+  "stats": {
+    "title": "ئامار",
+    "today": "ئەمڕۆ",
+    "thisWeek": "ئەم هەفتەیە",
+    "thisMonth": "ئەم مانگە",
+    "completed": "تەواو کراو",
+    "completionRate": "ڕێژەی تەواوکردن",
+    "streak": "زنجیرە",
+    "missed": "لێدراو",
+    "snoozed": "دواخراو",
+    "days": "ڕۆژ"
+  },
+  "search": {
+    "placeholder": "گەڕان...",
+    "noResults": "هیچ ئەنجامێک نەدۆزرایەوە"
+  },
+  "filters": {
+    "all": "هەموو",
+    "pending": "چاوەڕوان",
+    "completed": "تەواو",
+    "overdue": "دواکەوتوو",
+    "today": "ئەمڕۆ",
+    "upcoming": "داهاتوو"
+  },
+  "settings": {
+    "title": "ڕێکخستن",
+    "language": "زمان",
+    "theme": "ڕەنگ",
+    "themeLight": "ڕووناک",
+    "themeDark": "تاریک",
+    "themeSystem": "سیستەم",
+    "notifications": "ئاگادارییەکان",
+    "defaultReminder": "جۆری بیرهێنانی بنەڕەت",
+    "defaultSnooze": "دواخستنی بنەڕەت",
+    "weekStart": "دەستپێکی هەفتە",
+    "timeFormat": "فۆرماتی کات",
+    "export": "هەناردەکردن",
+    "import": "هاوردەکردن",
+    "about": "دەربارە",
+    "version": "وەشان"
+  },
+  "onboarding": {
+    "step1Title": "ڕۆژەکەت پلان بکە",
+    "step1Desc": "بە خێرایی پلان بۆ ئەمڕۆ، سبەی، یان هەر ڕۆژێک دروست بکە.",
+    "step2Title": "هەرگیز لەبیر مەکە",
+    "step2Desc": "بیرهێنەرێکی زیرەک بۆ پلانەکانت دابنێ.",
+    "step3Title": "دواخستنی خێرا",
+    "step3Desc": "پلانێک لەبیرچوو؟ بە یەک کلیک دووبارە خشتەی بکە.",
+    "getStarted": "دەست پێ بکە",
+    "allowNotifications": "ڕێگە بە ئاگاداری بدە"
+  },
+  "common": {
+    "cancel": "پاشگەزبوونەوە",
+    "save": "پاشەکەوت",
+    "delete": "سڕینەوە",
+    "undo": "گەڕاندنەوە",
+    "deleted": "پلانەکە سڕایەوە",
+    "completed": "پلانەکە تەواو کرا ✓",
+    "confirm": "دڵنیاکردنەوە",
+    "loading": "چاوەڕوان بە..."
+  },
+  "notification": {
+    "reminderTitle": "⏰ کاتی «{{title}}»",
+    "overdueTitle": "⏰ کاتی «{{title}}» تێپەڕی",
+    "complete": "تەواو",
+    "snooze": "دواخستن",
+    "open": "کردنەوە"
+  }
+}

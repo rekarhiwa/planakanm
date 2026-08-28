@@ -1,0 +1,170 @@
+{
+  "app": {
+    "name": "My Plans"
+  },
+  "tabs": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "stats": "Stats",
+    "settings": "Settings"
+  },
+  "greeting": {
+    "morning": "Good morning ☀️",
+    "afternoon": "Good afternoon 🌤",
+    "evening": "Good evening 🌙",
+    "night": "Good night 🌙"
+  },
+  "home": {
+    "remaining": "{{count}} plans remaining",
+    "now": "Now",
+    "overdue": "Overdue",
+    "today": "Today",
+    "upcoming": "Upcoming",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "noTime": "No time",
+    "newPlan": "New plan",
+    "emptyTitle": "No plans yet 🎯",
+    "emptySubtitle": "Great time to add your first plan.",
+    "completeNow": "Complete",
+    "snoozeNow": "Snooze"
+  },
+  "create": {
+    "title": "What do you want to do?",
+    "placeholder": "What's your plan?",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "pickDate": "Pick date",
+    "setTime": "Set time",
+    "noRepeat": "No repeat",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "addPlan": "Add plan",
+    "advanced": "More options",
+    "category": "Category",
+    "priority": "Priority",
+    "notes": "Notes",
+    "reminderType": "Reminder type",
+    "notification": "Notification",
+    "alarm": "Alarm"
+  },
+  "snooze": {
+    "title": "When should we remind you?",
+    "overdueTitle": "Your plan is overdue",
+    "missedQuestion": "You missed this plan. When should we remind you?",
+    "5min": "5 minutes",
+    "10min": "10 minutes",
+    "15min": "15 minutes",
+    "30min": "30 minutes",
+    "1hour": "1 hour",
+    "2hours": "2 hours",
+    "tomorrow": "Tomorrow",
+    "custom": "Custom time",
+    "doNow": "Do now"
+  },
+  "status": {
+    "pending": "Pending",
+    "completed": "Completed",
+    "overdue": "Overdue",
+    "snoozed": "Snoozed",
+    "cancelled": "Cancelled"
+  },
+  "priority": {
+    "low": "Low",
+    "normal": "Normal",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "detail": {
+    "complete": "Complete",
+    "edit": "Edit",
+    "snooze": "Snooze",
+    "reschedule": "Reschedule",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "history": "History",
+    "date": "Date",
+    "time": "Time",
+    "repeat": "Repeat",
+    "category": "Category",
+    "notes": "Notes"
+  },
+  "calendar": {
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "plansCount": "{{count}} plans"
+  },
+  "stats": {
+    "title": "Statistics",
+    "today": "Today",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "completed": "Completed",
+    "completionRate": "Completion rate",
+    "streak": "Streak",
+    "missed": "Missed",
+    "snoozed": "Snoozed",
+    "days": "days"
+  },
+  "search": {
+    "placeholder": "Search...",
+    "noResults": "No results found"
+  },
+  "filters": {
+    "all": "All",
+    "pending": "Pending",
+    "completed": "Completed",
+    "overdue": "Overdue",
+    "today": "Today",
+    "upcoming": "Upcoming"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "notifications": "Notifications",
+    "defaultReminder": "Default reminder",
+    "defaultSnooze": "Default snooze",
+    "weekStart": "Week starts on",
+    "timeFormat": "Time format",
+    "export": "Export",
+    "import": "Import",
+    "about": "About",
+    "version": "Version"
+  },
+  "onboarding": {
+    "step1Title": "Plan your day",
+    "step1Desc": "Quickly create plans for today, tomorrow, or any day.",
+    "step2Title": "Never forget",
+    "step2Desc": "Set smart reminders for your plans.",
+    "step3Title": "Snooze instantly",
+    "step3Desc": "Missed a plan? Reschedule with one tap.",
+    "getStarted": "Get started",
+    "allowNotifications": "Allow notifications"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "undo": "Undo",
+    "deleted": "Plan deleted",
+    "completed": "Plan completed ✓",
+    "confirm": "Confirm",
+    "loading": "Loading..."
+  },
+  "notification": {
+    "reminderTitle": "⏰ Time for «{{title}}»",
+    "overdueTitle": "⏰ «{{title}}» is overdue",
+    "complete": "Complete",
+    "snooze": "Snooze",
+    "open": "Open"
+  }
+}
