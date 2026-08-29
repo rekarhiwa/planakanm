@@ -3,12 +3,13 @@ import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { RootStackParamList } from '../navigation';
 import type { Plan } from '../domain/entities/types';
 import * as planRepo from '../data/repositories/planRepository';
+import { useDialogStore } from '../stores/dialogStore';
 import { usePlanStore } from '../stores/planStore';
 import { useUIStore } from '../stores/uiStore';
 import { radius, spacing, typography } from '../theme/colors';
@@ -20,16 +21,19 @@ export function PlanDetailScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'PlanDetail'>>();
   const [plan, setPlan] = useState<Plan | null>(null);
+  const [notes, setNotes] = useState('');
   const [history, setHistory] = useState<Awaited<ReturnType<typeof planRepo.getPlanHistory>>>([]);
 
   const completePlan = usePlanStore((s) => s.completePlan);
   const deletePlan = usePlanStore((s) => s.deletePlan);
+  const updatePlan = usePlanStore((s) => s.updatePlan);
   const openSnooze = useUIStore((s) => s.openSnooze);
   const showUndo = useUIStore((s) => s.showUndo);
 
   const loadPlan = useCallback(async () => {
     const p = await planRepo.getPlanById(route.params.planId);
     setPlan(p);
+    setNotes(p?.description ?? '');
     if (p) {
       const h = await planRepo.getPlanHistory(p.id);
       setHistory(h);
@@ -39,6 +43,39 @@ export function PlanDetailScreen() {
   useEffect(() => {
     loadPlan();
   }, [loadPlan]);
+
+  const saveNotes = async () => {
+    if (!plan) return;
+    const trimmed = notes.trim();
+    const current = plan.description ?? '';
+    if (trimmed === current) return;
+
+    const updated = await updatePlan(plan.id, {
+      description: trimmed || undefined,
+    });
+    if (updated) {
+      setPlan(updated);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!plan) return;
+
+    const confirmed = await useDialogStore.getState().showConfirm({
+      title: t('detail.deleteTitle'),
+      message: t('detail.deleteMessage'),
+      confirmLabel: t('common.delete'),
+      accent: 'danger',
+      destructive: true,
+      highlight: { color: colors.primary, label: plan.title },
+    });
+
+    if (!confirmed) return;
+
+    await deletePlan(plan.id);
+    showUndo(t('common.deleted'));
+    navigation.goBack();
+  };
 
   if (!plan) {
     return (
@@ -53,7 +90,7 @@ export function PlanDetailScreen() {
   const actions = [
     { key: 'complete', label: t('detail.complete'), action: async () => { await completePlan(plan.id); navigation.goBack(); } },
     { key: 'snooze', label: t('detail.snooze'), action: () => openSnooze(plan.id) },
-    { key: 'delete', label: t('detail.delete'), action: async () => { await deletePlan(plan.id); showUndo(t('common.deleted')); navigation.goBack(); } },
+    { key: 'delete', label: t('detail.delete'), action: () => { void handleDelete(); } },
   ];
 
   return (
@@ -73,10 +110,27 @@ export function PlanDetailScreen() {
           )}
           <InfoRow label={t('detail.repeat')} value={t(`create.${plan.repeatType === 'none' ? 'noRepeat' : plan.repeatType}`)} colors={colors} />
           <InfoRow label={t('detail.priority')} value={t(`priority.${plan.priority}`)} colors={colors} />
-          {plan.description && (
-            <InfoRow label={t('detail.notes')} value={plan.description} colors={colors} />
-          )}
         </View>
+
+        <Text style={[styles.notesLabel, { color: colors.textSecondary }]}>{t('detail.notes')}</Text>
+        <TextInput
+          value={notes}
+          onChangeText={setNotes}
+          onBlur={() => { void saveNotes(); }}
+          placeholder={t('detail.notesPlaceholder')}
+          placeholderTextColor={colors.textSecondary}
+          multiline
+          numberOfLines={4}
+          textAlignVertical="top"
+          style={[
+            styles.notesInput,
+            {
+              color: colors.text,
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+            },
+          ]}
+        />
 
         <View style={styles.actions}>
           {actions.map((a) => (
@@ -141,8 +195,18 @@ const styles = StyleSheet.create({
   back: { alignSelf: 'flex-start', padding: spacing.sm, marginBottom: spacing.md },
   title: { ...typography.display, fontSize: 28, textAlign: 'right', marginBottom: spacing.sm },
   status: { ...typography.label, textAlign: 'right', marginBottom: spacing.xl },
-  infoCard: { borderRadius: radius.lg, borderWidth: 1, padding: spacing.lg, marginBottom: spacing.xl },
+  infoCard: { borderRadius: radius.lg, borderWidth: 1, padding: spacing.lg, marginBottom: spacing.lg },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.sm },
+  notesLabel: { ...typography.caption, textAlign: 'right', marginBottom: spacing.sm },
+  notesInput: {
+    borderWidth: 1,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    ...typography.body,
+    textAlign: 'right',
+    minHeight: 96,
+    marginBottom: spacing.xl,
+  },
   actions: { gap: spacing.sm, marginBottom: spacing.xl },
   actionBtn: { padding: spacing.lg, borderRadius: radius.md, alignItems: 'center' },
   sectionTitle: { ...typography.title, textAlign: 'right', marginBottom: spacing.md },

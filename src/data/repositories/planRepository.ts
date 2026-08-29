@@ -146,6 +146,13 @@ export async function getPlansForDate(date: string): Promise<Plan[]> {
   return rows.map(rowToPlan);
 }
 
+export async function countPendingPlansForDate(date: string): Promise<number> {
+  const dayPlans = await getPlansForDate(date);
+  return dayPlans.filter(
+    (plan) => plan.status === 'pending' || plan.status === 'snoozed' || plan.status === 'overdue',
+  ).length;
+}
+
 export async function getPlansInRange(startDate: string, endDate: string): Promise<Plan[]> {
   const db = getDb();
   const rows = await db
@@ -301,6 +308,14 @@ export async function setNotificationId(id: string, notificationId: string): Pro
   await db
     .update(plans)
     .set({ notificationId, updatedAt: Date.now() })
+    .where(eq(plans.id, id));
+}
+
+export async function clearNotificationId(id: string): Promise<void> {
+  const db = getDb();
+  await db
+    .update(plans)
+    .set({ notificationId: null, updatedAt: Date.now() })
     .where(eq(plans.id, id));
 }
 

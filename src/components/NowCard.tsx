@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { Plan } from '../domain/entities/types';
 import { radius, spacing, typography } from '../theme/colors';
+import { getPlanRemainingParts } from '../utils/dates';
 import { useTheme } from '../theme/ThemeContext';
 
 interface NowCardProps {
@@ -11,30 +13,69 @@ interface NowCardProps {
   onSnooze: () => void;
 }
 
+function useRemainingLabel(plan: Plan): string {
+  const { t } = useTranslation();
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTick((value) => value + 1), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const remaining = getPlanRemainingParts(plan);
+  if (!remaining) return '';
+
+  if (remaining.dueNow) {
+    return t('home.dueNow');
+  }
+
+  if (remaining.hours === 0) {
+    return t('home.remainingMinutes', { count: remaining.minutes });
+  }
+
+  if (remaining.minutes === 0) {
+    return t('home.remainingHoursOnly', { hours: remaining.hours });
+  }
+
+  return t('home.remainingHours', { hours: remaining.hours, minutes: remaining.minutes });
+}
+
 export function NowCard({ plan, onComplete, onSnooze }: NowCardProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const remainingLabel = useRemainingLabel(plan);
 
   return (
     <View style={[styles.card, { backgroundColor: colors.nowHighlight, borderColor: colors.primary }]}>
-      <Text style={[styles.label, { color: colors.primary }]}>{t('home.now')}</Text>
-      <Text style={[styles.title, { color: colors.text }]}>{plan.title}</Text>
-      {plan.time && (
-        <Text style={[styles.time, { color: colors.textSecondary }]}>{plan.time}</Text>
-      )}
-      <View style={styles.actions}>
-        <Pressable
-          onPress={onComplete}
-          style={[styles.btn, { backgroundColor: colors.primary }]}
-        >
-          <Text style={{ color: colors.fabText, ...typography.label }}>{t('home.completeNow')}</Text>
-        </Pressable>
-        <Pressable
-          onPress={onSnooze}
-          style={[styles.btn, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}
-        >
-          <Text style={{ color: colors.text, ...typography.label }}>{t('home.snoozeNow')}</Text>
-        </Pressable>
+      <View style={styles.main}>
+        <View style={styles.textBlock}>
+          <Text style={[styles.badge, { color: colors.primary }]}>{t('home.now')}</Text>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+            {plan.title}
+          </Text>
+          {remainingLabel ? (
+            <Text style={[styles.remaining, { color: colors.textSecondary }]} numberOfLines={1}>
+              {remainingLabel}
+            </Text>
+          ) : null}
+        </View>
+
+        <View style={styles.actions}>
+          <Pressable
+            onPress={onComplete}
+            hitSlop={8}
+            style={[styles.iconBtn, { backgroundColor: colors.primary, borderColor: colors.primary }]}
+          >
+            <Text style={{ color: colors.fabText, fontSize: 15 }}>✓</Text>
+          </Pressable>
+          <Pressable
+            onPress={onSnooze}
+            hitSlop={8}
+            style={[styles.iconBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          >
+            <Text style={{ fontSize: 14 }}>💤</Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -42,34 +83,47 @@ export function NowCard({ plan, onComplete, onSnooze }: NowCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: radius.lg,
-    borderWidth: 2,
-    padding: spacing.xl,
-    marginBottom: spacing.lg,
-  },
-  label: {
-    ...typography.label,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginHorizontal: spacing.lg,
     marginBottom: spacing.sm,
-    textAlign: 'right',
+  },
+  main: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  textBlock: {
+    flex: 1,
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  badge: {
+    ...typography.caption,
+    fontSize: 11,
   },
   title: {
-    ...typography.title,
+    ...typography.label,
+    fontSize: 15,
     textAlign: 'right',
-    marginBottom: spacing.xs,
   },
-  time: {
-    ...typography.body,
+  remaining: {
+    ...typography.caption,
     textAlign: 'right',
-    marginBottom: spacing.lg,
   },
   actions: {
     flexDirection: 'row',
-    gap: spacing.sm,
-    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
-  btn: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
+  iconBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

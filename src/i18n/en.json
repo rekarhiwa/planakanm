@@ -4,6 +4,7 @@
   },
   "tabs": {
     "home": "Home",
+    "notes": "Notes",
     "calendar": "Calendar",
     "stats": "Stats",
     "settings": "Settings"
@@ -27,7 +28,11 @@
     "emptyTitle": "No plans yet 🎯",
     "emptySubtitle": "Great time to add your first plan.",
     "completeNow": "Complete",
-    "snoozeNow": "Snooze"
+    "snoozeNow": "Snooze",
+    "dueNow": "Due now",
+    "remainingMinutes": "{{count}} min left",
+    "remainingHoursOnly": "{{hours}} hr left",
+    "remainingHours": "{{hours}} hr {{minutes}} min left"
   },
   "create": {
     "title": "What do you want to do?",
@@ -42,13 +47,19 @@
     "monthly": "Monthly",
     "yearly": "Yearly",
     "addPlan": "Add plan",
+    "alarmTitle": "Alarm title",
+    "alarmNote": "Alarm note",
     "advanced": "More options",
     "category": "Category",
     "priority": "Priority",
     "notes": "Notes",
+    "notesPlaceholder": "Add a note (optional)...",
     "reminderType": "Reminder type",
     "notification": "Notification",
-    "alarm": "Alarm"
+    "alarm": "Alarm",
+    "fullscreenAlarm": "Full-screen alarm",
+    "fullscreenAlarmHint": "When the time arrives, a full-screen alarm opens.",
+    "notificationHint": "Shows a standard notification only."
   },
   "snooze": {
     "title": "When should we remind you?",
@@ -62,7 +73,14 @@
     "2hours": "2 hours",
     "tomorrow": "Tomorrow",
     "custom": "Custom time",
-    "doNow": "Do now"
+    "doNow": "Do now",
+    "customSection": "Custom",
+    "byMinutes": "By minutes",
+    "byTime": "By time",
+    "minutesLabel": "How many minutes later?",
+    "applyMinutes": "Snooze by minutes",
+    "applyTime": "Snooze to this time",
+    "minuteUnit": "min"
   },
   "status": {
     "pending": "Pending",
@@ -89,7 +107,10 @@
     "time": "Time",
     "repeat": "Repeat",
     "category": "Category",
-    "notes": "Notes"
+    "notes": "Notes",
+    "notesPlaceholder": "Add a note...",
+    "deleteTitle": "Delete plan",
+    "deleteMessage": "Are you sure you want to delete this plan?"
   },
   "calendar": {
     "week": "Week",
@@ -132,15 +153,73 @@
     "themeSystem": "System",
     "notifications": "Notifications",
     "defaultReminder": "Default reminder",
+    "defaultReminderHint": "This is the default for new plans. You can change it per plan.",
+    "permissionNotifications": "Notifications",
+    "permissionExactAlarm": "Exact alarms",
+    "permissionFullScreen": "Full-screen alarms",
+    "permissionEnable": "Enable",
+    "permissionGranted": "Enabled",
+    "permissionNeeded": "Needs to be enabled",
+    "permissionOptional": "Recommended to enable",
+    "alarmPermissionsTitle": "Alarm permissions",
+    "alarmPermissionsDesc": "Enable these for full-screen alarms. The button opens the permission screen directly.",
+    "alarmPermissionsSamsungDesc": "On Samsung, also enable unrestricted battery usage for reliable alarms.",
+    "permissionBattery": "Unrestricted battery (Samsung)",
+    "profile": "Profile",
+    "enableAllAlarmPermissions": "Enable all permissions",
+    "enableNotifications": "Enable notifications",
     "defaultSnooze": "Default snooze",
     "weekStart": "Week starts on",
     "timeFormat": "Time format",
     "export": "Export",
     "import": "Import",
+    "exportErrorTitle": "Export failed",
+    "exportErrorMessage": "Could not export your plans. Please try again.",
+    "importSuccessTitle": "Import complete",
+    "importSuccessMessage": "{{count}} plans imported successfully.",
+    "importErrorTitle": "Import failed",
+    "importErrorMessage": "Could not import plans. Check the file and try again.",
+    "notificationRequiredTitle": "Notification permission",
+    "notificationRequiredMessage": "Notification permission is required for alarms to work.",
+    "allPermissionsReady": "All permissions enabled",
+    "lockScreenHint": "Notifications and alarms appear on the lock screen. Full-screen alarms wake the display.",
     "about": "About",
     "version": "Version"
   },
+  "about": {
+    "title": "About",
+    "back": "Back",
+    "tagline": "Daily planning and reminders",
+    "versionLabel": "Version {{version}}",
+    "openHint": "Info, features, and terms",
+    "footer": "Planakanm — built to simplify your day",
+    "pages": {
+      "app": "About the app",
+      "features": "Features",
+      "notifications": "Notifications & lock screen",
+      "privacy": "Privacy",
+      "terms": "Terms of use"
+    },
+    "subtitles": {
+      "app": "Purpose and overview",
+      "features": "What you can do",
+      "notifications": "How lock screen alerts work",
+      "privacy": "How your data is protected",
+      "terms": "Terms of use"
+    },
+    "content": {
+      "app": "Planakanm is a simple daily planning app.\n\nCreate plans, notes, and alarms, organize with categories, and never miss what matters.\n\nAll your data stays on your device. No account or internet required.",
+      "features": "• Daily plans with or without time\n• Full-screen alarms for important tasks\n• Notes with linked alarms\n• Morning (8:00) and evening (6:00) digests\n• Daily, weekly, monthly repeats\n• Categories and filters\n• Export and import plans\n• Kurdish, Arabic, and English\n• Light and dark themes",
+      "notifications": "When all permissions are enabled:\n\n• Notifications appear on the lock screen\n• Full-screen alarms wake the display and play sound\n• Morning digest shows today's reminder count\n• Evening digest only if plans remain\n\nNote: On some phones (e.g. Samsung), enable unrestricted battery use so alarms work in the background.",
+      "privacy": "Planakanm does not collect or send personal data to servers.\n\n• Plans and notes are stored only on your device\n• Export happens only when you choose\n• Notification permission is used only for reminders\n\nWe do not sell or share your data with third parties.",
+      "terms": "Using Planakanm means you agree to these terms:\n\n• The app is provided as-is\n• You are responsible for your plans and alarms\n• We recommend backing up via export\n\nIf you have questions, contact us through Settings."
+    }
+  },
   "onboarding": {
+    "profileTitle": "What's your name?",
+    "profileDesc": "We'll create your profile to personalize the app.",
+    "namePlaceholder": "Enter your name",
+    "next": "Next",
     "step1Title": "Plan your day",
     "step1Desc": "Quickly create plans for today, tomorrow, or any day.",
     "step2Title": "Never forget",
@@ -158,6 +237,7 @@
     "deleted": "Plan deleted",
     "completed": "Plan completed ✓",
     "confirm": "Confirm",
+    "ok": "OK",
     "loading": "Loading..."
   },
   "notification": {
@@ -165,6 +245,52 @@
     "overdueTitle": "⏰ «{{title}}» is overdue",
     "complete": "Complete",
     "snooze": "Snooze",
-    "open": "Open"
+    "open": "Open",
+    "dailyDigest": {
+      "morningTitle": "Today's reminders",
+      "morningBody": "You have {{count}} reminders today",
+      "eveningTitle": "Evening reminders",
+      "eveningBody": "{{count}} reminders still pending"
+    }
+  },
+  "categories": {
+    "title": "Categories",
+    "hint": "Create categories to organize your plans. They won't appear on the home screen until you add one.",
+    "namePlaceholder": "Category name",
+    "add": "Add category",
+    "all": "All",
+    "none": "No category",
+    "deleteTitle": "Delete category",
+    "deleteMessage": "Delete this category? Plans will keep their data without it."
+  },
+  "alarm": {
+    "fullscreenBadge": "Alarm",
+    "snooze15": "Snooze 15 min",
+    "customSnooze": "Custom snooze",
+    "complete": "Complete",
+    "dismiss": "Dismiss"
+  },
+  "notes": {
+    "screenTitle": "Notes",
+    "sectionTitle": "Notes",
+    "add": "New note",
+    "addTitle": "New note",
+    "addHint": "No reminders — just for reading when you're bored",
+    "noteTitle": "Note title",
+    "noteBody": "Note content",
+    "hasAlarm": "Alarm enabled",
+    "addAlarm": "Add alarm",
+    "titlePlaceholder": "Title...",
+    "bodyPlaceholder": "Write your note here...",
+    "save": "Save",
+    "back": "Back",
+    "untitled": "Untitled",
+    "emptyTitle": "No notes yet",
+    "empty": "Add one for when you have free time.",
+    "completed": "Done",
+    "deleteTitle": "Delete note",
+    "deleteMessage": "Are you sure you want to delete this note?",
+    "deleted": "Note deleted",
+    "convertHint": "Swipe right to convert to a plan"
   }
 }

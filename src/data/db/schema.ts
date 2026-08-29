@@ -56,3 +56,22 @@ export const settings = sqliteTable('settings', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),
 });
+
+export const notes = sqliteTable(
+  'notes',
+  {
+    id: text('id').primaryKey(),
+    title: text('title').notNull(),
+    body: text('body'),
+    hasAlarm: integer('has_alarm', { mode: 'boolean' }).notNull().default(false),
+    alarmDate: text('alarm_date'),
+    alarmTime: text('alarm_time'),
+    planId: text('plan_id'),
+    completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
+    completedAt: text('completed_at'),
+    deletedAt: text('deleted_at'),
+    createdAt: integer('created_at').notNull(),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (table) => [index('notes_completed_idx').on(table.completed)],
+);

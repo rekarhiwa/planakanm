@@ -1,8 +1,9 @@
 import { addDays, format, parseISO } from 'date-fns';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
-import { getDayNameShort, getTodayISO } from '../utils/dates';
-import { radius, spacing, typography } from '../theme/colors';
+import { getDayNameCompact, getTodayISO } from '../utils/dates';
+import { radius, spacing } from '../theme/colors';
+import { FONT_FAMILY } from '../theme/fonts';
 import { useTheme } from '../theme/ThemeContext';
 import { useSettingsStore } from '../stores/settingsStore';
 
@@ -54,8 +55,11 @@ export function DateSelector({
                 styles.dayName,
                 { color: isSelected ? colors.fabText : colors.textSecondary },
               ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
             >
-              {getDayNameShort(date, language)}
+              {getDayNameCompact(date, language)}
             </Text>
             <Text
               style={[
@@ -75,23 +79,30 @@ export function DateSelector({
 const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: spacing.lg,
-    gap: spacing.sm,
+    gap: spacing.xs,
     paddingVertical: spacing.sm,
   },
   item: {
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     borderRadius: radius.md,
     borderWidth: 1,
-    minWidth: 52,
+    minWidth: 46,
+    maxWidth: 58,
+    gap: 1,
   },
   dayName: {
-    ...typography.caption,
-    marginBottom: 2,
+    fontFamily: FONT_FAMILY,
+    fontSize: 9,
+    lineHeight: 11,
+    textAlign: 'center',
   },
   dayNum: {
-    ...typography.label,
-    fontSize: 18,
+    fontFamily: FONT_FAMILY,
+    fontSize: 17,
+    lineHeight: 20,
+    fontWeight: '600',
   },
 });

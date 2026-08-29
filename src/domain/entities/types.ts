@@ -34,6 +34,39 @@ export interface Plan {
   updatedAt: number;
 }
 
+export interface Note {
+  id: string;
+  title: string;
+  body?: string;
+  hasAlarm: boolean;
+  alarmDate?: string;
+  alarmTime?: string;
+  planId?: string;
+  completed: boolean;
+  completedAt?: string;
+  deletedAt?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface CreateNoteInput {
+  title: string;
+  body?: string;
+  hasAlarm?: boolean;
+  alarmDate?: string;
+  alarmTime?: string;
+  planId?: string;
+}
+
+export interface SaveNoteInput {
+  id?: string;
+  title: string;
+  body?: string;
+  hasAlarm: boolean;
+  alarmDate?: string;
+  alarmTime?: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -61,6 +94,7 @@ export interface AppSettings {
   onboardingComplete: boolean;
   notificationsEnabled: boolean;
   vibrationEnabled: boolean;
+  userName?: string;
 }
 
 export type SnoozePreset =

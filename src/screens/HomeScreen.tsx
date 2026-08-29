@@ -5,24 +5,30 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppIcon } from '../components/AppIcon';
 import { DateSelector } from '../components/DateSelector';
+import { CategoryFilterChips } from '../components/CategoryFilterChips';
 import { EmptyState } from '../components/EmptyState';
 import { FAB } from '../components/FAB';
 import { FilterChips } from '../components/FilterChips';
 import { NowCard } from '../components/NowCard';
 import { OverdueDialog } from '../components/OverdueDialog';
 import { PlanRow } from '../components/PlanRow';
-import { QuickCreateSheet } from '../components/QuickCreateSheet';
 import { SectionHeader } from '../components/SectionHeader';
 import { SnoozePicker } from '../components/SnoozePicker';
 import { UndoSnackbar } from '../components/UndoSnackbar';
+import { navigateToCreatePlan } from '../navigation/navigationRef';
 import type { RootStackParamList } from '../navigation';
 import type { Plan } from '../domain/entities/types';
 import { filterPlans, usePlanStore } from '../stores/planStore';
+import { useDialogStore } from '../stores/dialogStore';
+import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { spacing, typography } from '../theme/colors';
+import { alignItemsEnd } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
-import { getGreetingKey, getTodayISO, groupPlansByTime, isPlanNow } from '../utils/dates';
+import type { SnoozeSelection } from '../domain/services/snoozeEngine';
+import { getGreetingKey, groupPlansByTime, isPlanNow } from '../utils/dates';
 
 export function HomeScreen() {
   const { colors } = useTheme();
@@ -32,9 +38,11 @@ export function HomeScreen() {
   const rawPlans = usePlanStore((s) => s.plans);
   const filter = usePlanStore((s) => s.filter);
   const searchQuery = usePlanStore((s) => s.searchQuery);
+  const categoryFilter = usePlanStore((s) => s.categoryFilter);
+  const categories = usePlanStore((s) => s.categories);
   const plans = useMemo(
-    () => filterPlans(rawPlans, filter, searchQuery),
-    [rawPlans, filter, searchQuery],
+    () => filterPlans(rawPlans, filter, searchQuery, categoryFilter),
+    [rawPlans, filter, searchQuery, categoryFilter],
   );
   const selectedDate = usePlanStore((s) => s.selectedDate);
   const setSelectedDate = usePlanStore((s) => s.setSelectedDate);
@@ -45,10 +53,8 @@ export function HomeScreen() {
   const snoozePlan = usePlanStore((s) => s.snoozePlan);
   const checkOverdue = usePlanStore((s) => s.checkOverdue);
   const isLoading = usePlanStore((s) => s.isLoading);
+  const userName = useSettingsStore((s) => s.settings.userName);
 
-  const showQuickCreate = useUIStore((s) => s.showQuickCreate);
-  const openQuickCreate = useUIStore((s) => s.openQuickCreate);
-  const closeQuickCreate = useUIStore((s) => s.closeQuickCreate);
   const showSnoozeSheet = useUIStore((s) => s.showSnoozeSheet);
   const snoozePlanId = useUIStore((s) => s.snoozePlanId);
   const openSnooze = useUIStore((s) => s.openSnooze);
@@ -75,7 +81,8 @@ export function HomeScreen() {
     });
   }, [selectedDate, loadPlansForDate, checkOverdue, setOverdueDialog]);
 
-  const greeting = t(`greeting.${getGreetingKey()}`);
+  const greetingBase = t(`greeting.${getGreetingKey()}`);
+  const greeting = userName?.trim() ? `${greetingBase}، ${userName.trim()}` : greetingBase;
   const pendingCount = plans.filter((p) => p.status === 'pending' || p.status === 'overdue').length;
   const groups = groupPlansByTime(plans);
   const nowPlan = plans.find((p) => isPlanNow(p) && p.status !== 'completed');
@@ -97,21 +104,38 @@ export function HomeScreen() {
   );
 
   const handleDelete = useCallback(
-    async (id: string) => {
-      await deletePlan(id);
+    async (plan: Plan) => {
+      const confirmed = await useDialogStore.getState().showConfirm({
+        title: t('detail.deleteTitle'),
+        message: t('detail.deleteMessage'),
+        confirmLabel: t('common.delete'),
+        accent: 'danger',
+        destructive: true,
+        highlight: { color: colors.primary, label: plan.title },
+      });
+
+      if (!confirmed) return;
+
+      await deletePlan(plan.id);
       showUndo(t('common.deleted'));
     },
-    [deletePlan, showUndo, t],
+    [colors.primary, deletePlan, showUndo, t],
   );
 
   const handleSnoozeSelect = useCallback(
-    async (preset: string) => {
-      if (snoozePlanId) await snoozePlan(snoozePlanId, preset);
+    async (selection: SnoozeSelection) => {
+      if (snoozePlanId) await snoozePlan(snoozePlanId, selection);
     },
     [snoozePlanId, snoozePlan],
   );
 
   const overduePlan = overdueList[0] ?? (overduePlans.length > 0 ? plans.find((p) => p.id === overduePlans[0]) : undefined);
+
+  const getPlanRowProps = (plan: Plan) => ({
+    plan,
+    category: categories.find((c) => c.id === plan.categoryId),
+    showCategory: categories.length > 0,
+  });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -123,30 +147,28 @@ export function HomeScreen() {
       >
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <Pressable onPress={() => navigation.navigate('Search')} hitSlop={12}>
-              <Text style={{ fontSize: 22 }}>🔍</Text>
-            </Pressable>
             <View style={styles.headerText}>
               <Text style={[styles.greeting, { color: colors.text }]}>{greeting}</Text>
               <Text style={[styles.remaining, { color: colors.textSecondary }]}>
                 {t('home.remaining', { count: pendingCount })}
               </Text>
             </View>
+            <Pressable onPress={() => navigation.navigate('Search')} hitSlop={12} style={styles.searchBtn}>
+              <AppIcon name="Search" color={colors.textSecondary} size={22} />
+            </Pressable>
           </View>
         </View>
 
         <DateSelector selectedDate={selectedDate} onSelectDate={setSelectedDate} />
         <FilterChips />
+        <CategoryFilterChips />
 
         {nowPlan && (
-          <>
-            <SectionHeader title={t('home.now')} />
-            <NowCard
-              plan={nowPlan}
-              onComplete={() => handleComplete(nowPlan.id)}
-              onSnooze={() => openSnooze(nowPlan.id)}
-            />
-          </>
+          <NowCard
+            plan={nowPlan}
+            onComplete={() => handleComplete(nowPlan.id)}
+            onSnooze={() => openSnooze(nowPlan.id)}
+          />
         )}
 
         {overdueList.length > 0 && (
@@ -155,18 +177,18 @@ export function HomeScreen() {
             {overdueList.map((plan) => (
               <PlanRow
                 key={plan.id}
-                plan={plan}
+                {...getPlanRowProps(plan)}
                 onPress={() => handlePlanPress(plan)}
                 onComplete={() => handleComplete(plan.id)}
                 onSnooze={() => openSnooze(plan.id)}
-                onDelete={() => handleDelete(plan.id)}
+                onDelete={() => handleDelete(plan)}
               />
             ))}
           </>
         )}
 
         {plans.length === 0 ? (
-          <EmptyState onCreatePress={openQuickCreate} />
+          <EmptyState onCreatePress={() => navigateToCreatePlan()} />
         ) : (
           <>
             <SectionHeader title={t('home.today')} count={plans.length} />
@@ -179,11 +201,11 @@ export function HomeScreen() {
                 {groups.morning.map((plan) => (
                   <PlanRow
                     key={plan.id}
-                    plan={plan}
+                    {...getPlanRowProps(plan)}
                     onPress={() => handlePlanPress(plan)}
                     onComplete={() => handleComplete(plan.id)}
                     onSnooze={() => openSnooze(plan.id)}
-                    onDelete={() => handleDelete(plan.id)}
+                    onDelete={() => handleDelete(plan)}
                   />
                 ))}
               </>
@@ -197,11 +219,11 @@ export function HomeScreen() {
                 {groups.afternoon.map((plan) => (
                   <PlanRow
                     key={plan.id}
-                    plan={plan}
+                    {...getPlanRowProps(plan)}
                     onPress={() => handlePlanPress(plan)}
                     onComplete={() => handleComplete(plan.id)}
                     onSnooze={() => openSnooze(plan.id)}
-                    onDelete={() => handleDelete(plan.id)}
+                    onDelete={() => handleDelete(plan)}
                   />
                 ))}
               </>
@@ -215,12 +237,12 @@ export function HomeScreen() {
                 {groups.noTime.map((plan) => (
                   <PlanRow
                     key={plan.id}
-                    plan={plan}
+                    {...getPlanRowProps(plan)}
                     showTime={false}
                     onPress={() => handlePlanPress(plan)}
                     onComplete={() => handleComplete(plan.id)}
                     onSnooze={() => openSnooze(plan.id)}
-                    onDelete={() => handleDelete(plan.id)}
+                    onDelete={() => handleDelete(plan)}
                   />
                 ))}
               </>
@@ -232,11 +254,11 @@ export function HomeScreen() {
                 {upcomingPlans.map((plan) => (
                   <PlanRow
                     key={plan.id}
-                    plan={plan}
+                    {...getPlanRowProps(plan)}
                     onPress={() => handlePlanPress(plan)}
                     onComplete={() => handleComplete(plan.id)}
                     onSnooze={() => openSnooze(plan.id)}
-                    onDelete={() => handleDelete(plan.id)}
+                    onDelete={() => handleDelete(plan)}
                   />
                 ))}
               </>
@@ -245,9 +267,8 @@ export function HomeScreen() {
         )}
       </ScrollView>
 
-      <FAB label={t('home.newPlan')} onPress={openQuickCreate} />
+      <FAB label={t('home.newPlan')} onPress={() => navigateToCreatePlan()} />
 
-      <QuickCreateSheet visible={showQuickCreate} onClose={closeQuickCreate} />
       <SnoozePicker
         visible={showSnoozeSheet}
         onClose={closeSnooze}
@@ -257,7 +278,7 @@ export function HomeScreen() {
         visible={showOverdueDialog}
         planTitle={overduePlan?.title}
         onSnooze={(preset) => {
-          if (overduePlan) snoozePlan(overduePlan.id, preset);
+          if (overduePlan) snoozePlan(overduePlan.id, { kind: 'preset', key: preset });
           setOverdueDialog(false);
         }}
         onComplete={() => {
@@ -288,13 +309,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
+    gap: spacing.md,
   },
-  headerText: { flex: 1 },
-  greeting: { ...typography.display, fontSize: 26, textAlign: 'right' },
-  remaining: { ...typography.body, textAlign: 'right', marginTop: spacing.xs },
+  headerText: { flex: 1, alignItems: alignItemsEnd },
+  searchBtn: {
+    paddingTop: 4,
+  },
+  greeting: { ...typography.display, fontSize: 26 },
+  remaining: { ...typography.body, marginTop: spacing.xs },
   groupLabel: {
     ...typography.caption,
-    textAlign: 'right',
     paddingHorizontal: spacing.lg,
     marginTop: spacing.sm,
     marginBottom: spacing.xs,

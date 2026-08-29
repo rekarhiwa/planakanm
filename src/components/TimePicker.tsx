@@ -1,15 +1,25 @@
 import { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { formatTime24 } from '../utils/dates';
-import { radius, spacing, typography } from '../theme/colors';
+import { useSettingsStore } from '../stores/settingsStore';
+import {
+  formatAlarmDateHeader,
+  formatDateISO,
+  formatTime24,
+  getDayNameCompact,
+  getWeekDates,
+} from '../utils/dates';
+import { spacing } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
 import { useTheme } from '../theme/ThemeContext';
-import { Chip } from './Chip';
+import { ScrollWheel } from './ScrollWheel';
 
-const HOURS = Array.from({ length: 24 }, (_, index) => index);
-const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
-const PRESETS = ['08:00', '09:00', '12:00', '14:00', '17:00', '20:00'];
+const ITEM_HEIGHT = 52;
+const HOURS_24 = Array.from({ length: 24 }, (_, index) => index);
+const MINUTES = Array.from({ length: 60 }, (_, index) => index);
+const HOURS_12 = Array.from({ length: 12 }, (_, index) => index + 1);
+const PERIODS = ['am', 'pm'] as const;
 
 function parseTime(value: string): { hour: number; minute: number } {
   if (!value.includes(':')) {
@@ -30,86 +40,213 @@ function toTimeValue(hour: number, minute: number): string {
   return formatTime24(`${hour}:${minute}`);
 }
 
+function parseTimeDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function to12Hour(hour24: number): { hour12: number; period: 'am' | 'pm' } {
+  const period = hour24 >= 12 ? 'pm' : 'am';
+  const hour12 = hour24 % 12 || 12;
+  return { hour12, period };
+}
+
+function to24Hour(hour12: number, period: 'am' | 'pm'): number {
+  if (period === 'am') return hour12 === 12 ? 0 : hour12;
+  return hour12 === 12 ? 12 : hour12 + 12;
+}
+
+function wheelOpacity(distance: number, isSelected: boolean): number {
+  if (isSelected) return 1;
+  if (distance === 1) return 0.42;
+  if (distance === 2) return 0.22;
+  return 0.1;
+}
+
+function wheelFontSize(distance: number, isSelected: boolean, selectedSize: number): number {
+  if (isSelected) return selectedSize;
+  if (distance === 1) return selectedSize * 0.78;
+  return selectedSize * 0.66;
+}
+
 interface TimePickerProps {
   value: string;
   onChange: (time: string) => void;
+  date?: string;
+  onDateChange?: (date: string) => void;
 }
 
-export function TimePicker({ value, onChange }: TimePickerProps) {
+export function TimePicker({ value, onChange, date, onDateChange }: TimePickerProps) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
+  const language = useSettingsStore((s) => s.settings.language);
+  const timeFormat = useSettingsStore((s) => s.settings.timeFormat);
+  const weekStartsOn = useSettingsStore((s) => s.settings.weekStartsOn);
+
   const { hour, minute } = useMemo(() => parseTime(value), [value]);
-  const displayValue = toTimeValue(hour, minute);
+  const { hour12, period } = useMemo(() => to12Hour(hour), [hour]);
+
+  const weekDates = useMemo(() => {
+    if (!date) return [];
+    return getWeekDates(parseTimeDate(date), weekStartsOn);
+  }, [date, weekStartsOn]);
+
+  const dateHeader = date
+    ? formatAlarmDateHeader(date, language, t('create.today'), t('create.tomorrow'))
+    : null;
 
   const updateTime = (nextHour: number, nextMinute: number) => {
     onChange(toTimeValue(nextHour, nextMinute));
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
-      <View style={styles.displayRow}>
-        <Text style={[styles.display, { color: colors.text }]}>{displayValue}</Text>
-        <Text style={[styles.displayHint, { color: colors.textSecondary }]}>24h</Text>
-      </View>
+    <View style={[styles.container, { backgroundColor: colors.surfaceElevated }]}>
+      {date && onDateChange ? (
+        <>
+          <View style={styles.metaBlock}>
+            <Text style={[styles.dateHeader, { color: colors.textSecondary }]} numberOfLines={1}>
+              {dateHeader}
+            </Text>
+            <View style={styles.weekRow}>
+              {weekDates.map((weekDate) => {
+                const iso = formatDateISO(weekDate);
+                const selected = iso === date;
+                return (
+                  <Pressable
+                    key={iso}
+                    onPress={() => onDateChange(iso)}
+                    style={styles.weekCell}
+                  >
+                    <Text
+                      style={[
+                        styles.weekLetter,
+                        { color: selected ? colors.danger : colors.textSecondary },
+                      ]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.75}
+                    >
+                      {getDayNameCompact(weekDate, language)}
+                    </Text>
+                    {selected ? (
+                      <View style={[styles.weekDot, { backgroundColor: colors.danger }]} />
+                    ) : null}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+          <View style={[styles.divider, { backgroundColor: `${colors.border}88` }]} />
+        </>
+      ) : null}
 
-      <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>کاتی خێرا</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.presetRow}>
-        {PRESETS.map((preset) => (
-          <Chip
-            key={preset}
-            label={preset}
-            selected={displayValue === preset}
-            onPress={() => onChange(preset)}
+      <View style={styles.timeColumns}>
+        {timeFormat === '24h' ? (
+          <ScrollWheel
+            items={HOURS_24}
+            selectedIndex={hour}
+            onSelectIndex={(index) => updateTime(index, minute)}
+            itemHeight={ITEM_HEIGHT}
+            width={72}
+            fadeColor={colors.surfaceElevated}
+            keyExtractor={(item) => `h-${item}`}
+            renderItem={(item, { isSelected, distance }) => (
+              <Text
+                style={[
+                  styles.digit,
+                  {
+                    color: colors.text,
+                    opacity: wheelOpacity(distance, isSelected),
+                    fontSize: wheelFontSize(distance, isSelected, 36),
+                    fontWeight: isSelected ? '300' : '400',
+                  },
+                ]}
+              >
+                {String(item).padStart(2, '0')}
+              </Text>
+            )}
           />
-        ))}
-      </ScrollView>
+        ) : (
+          <ScrollWheel
+            items={HOURS_12}
+            selectedIndex={hour12 - 1}
+            onSelectIndex={(index) => updateTime(to24Hour(HOURS_12[index], period), minute)}
+            itemHeight={ITEM_HEIGHT}
+            width={64}
+            fadeColor={colors.surfaceElevated}
+            keyExtractor={(item) => `h12-${item}`}
+            renderItem={(item, { isSelected, distance }) => (
+              <Text
+                style={[
+                  styles.digit,
+                  {
+                    color: colors.text,
+                    opacity: wheelOpacity(distance, isSelected),
+                    fontSize: wheelFontSize(distance, isSelected, 36),
+                    fontWeight: isSelected ? '300' : '400',
+                  },
+                ]}
+              >
+                {String(item).padStart(2, '0')}
+              </Text>
+            )}
+          />
+        )}
 
-      <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>کاتژمێر</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.selectorRow}>
-        {HOURS.map((item) => {
-          const selected = item === hour;
-          return (
-            <Pressable
-              key={item}
-              onPress={() => updateTime(item, minute)}
+        <Text style={[styles.colon, { color: colors.text }]}>:</Text>
+
+        <ScrollWheel
+          items={MINUTES}
+          selectedIndex={minute}
+          onSelectIndex={(index) => updateTime(hour, index)}
+          itemHeight={ITEM_HEIGHT}
+          width={72}
+          fadeColor={colors.surfaceElevated}
+          keyExtractor={(item) => `m-${item}`}
+          renderItem={(item, { isSelected, distance }) => (
+            <Text
               style={[
-                styles.selectorItem,
+                styles.digit,
                 {
-                  backgroundColor: selected ? colors.primary : colors.surface,
-                  borderColor: selected ? colors.primary : colors.border,
+                  color: colors.text,
+                  opacity: wheelOpacity(distance, isSelected),
+                  fontSize: wheelFontSize(distance, isSelected, 36),
+                  fontWeight: isSelected ? '300' : '400',
                 },
               ]}
             >
-              <Text style={[styles.selectorText, { color: selected ? colors.fabText : colors.text }]}>
-                {String(item).padStart(2, '0')}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+              {String(item).padStart(2, '0')}
+            </Text>
+          )}
+        />
 
-      <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>خولەک</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.selectorRow}>
-        {MINUTES.map((item) => {
-          const selected = item === minute;
-          return (
-            <Pressable
-              key={item}
-              onPress={() => updateTime(hour, item)}
-              style={[
-                styles.selectorItem,
-                {
-                  backgroundColor: selected ? colors.primary : colors.surface,
-                  borderColor: selected ? colors.primary : colors.border,
-                },
-              ]}
-            >
-              <Text style={[styles.selectorText, { color: selected ? colors.fabText : colors.text }]}>
-                {String(item).padStart(2, '0')}
+        {timeFormat === '12h' ? (
+          <ScrollWheel
+            items={[...PERIODS]}
+            selectedIndex={period === 'am' ? 0 : 1}
+            onSelectIndex={(index) => updateTime(to24Hour(hour12, PERIODS[index]), minute)}
+            itemHeight={ITEM_HEIGHT}
+            width={56}
+            fadeColor={colors.surfaceElevated}
+            keyExtractor={(item) => item}
+            renderItem={(item, { isSelected, distance }) => (
+              <Text
+                style={[
+                  styles.period,
+                  {
+                    color: colors.textSecondary,
+                    opacity: wheelOpacity(distance, isSelected),
+                    fontSize: wheelFontSize(distance, isSelected, 16),
+                    fontWeight: isSelected ? '600' : '400',
+                  },
+                ]}
+              >
+                {item}
               </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+            )}
+          />
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -122,52 +259,73 @@ export function getDefaultTimeValue(): string {
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    gap: spacing.sm,
-  },
-  displayRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'baseline',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  display: {
-    fontFamily: FONT_FAMILY,
-    fontSize: 42,
-    letterSpacing: 1,
-  },
-  displayHint: {
-    ...typography.caption,
-  },
-  sectionLabel: {
-    ...typography.caption,
-    textAlign: 'right',
-    marginTop: spacing.xs,
-  },
-  presetRow: {
-    flexDirection: 'row-reverse',
-    gap: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  selectorRow: {
-    flexDirection: 'row-reverse',
-    gap: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  selectorItem: {
-    minWidth: 52,
-    paddingHorizontal: spacing.md,
+    borderRadius: 20,
     paddingVertical: spacing.sm,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
+    paddingHorizontal: spacing.xs,
+    marginBottom: spacing.md,
+    overflow: 'hidden',
   },
-  selectorText: {
+  metaBlock: {
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.xs,
+  },
+  dateHeader: {
     fontFamily: FONT_FAMILY,
-    fontSize: 16,
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
+    letterSpacing: 0.2,
+  },
+  weekRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.xs,
+  },
+  weekCell: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 3,
+    paddingVertical: 4,
+  },
+  weekLetter: {
+    fontFamily: FONT_FAMILY,
+    fontSize: 9,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  weekDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    marginHorizontal: spacing.lg,
+    marginVertical: spacing.sm,
+  },
+  timeColumns: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    paddingHorizontal: spacing.sm,
+  },
+  digit: {
+    fontFamily: FONT_FAMILY,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+  colon: {
+    fontFamily: FONT_FAMILY,
+    fontSize: 34,
+    fontWeight: '300',
+    marginBottom: 4,
+    opacity: 0.85,
+  },
+  period: {
+    fontFamily: FONT_FAMILY,
+    textAlign: 'center',
   },
 });

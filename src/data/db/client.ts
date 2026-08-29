@@ -56,11 +56,39 @@ CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY NOT NULL,
   value TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS notes (
+  id TEXT PRIMARY KEY NOT NULL,
+  title TEXT NOT NULL,
+  body TEXT,
+  completed INTEGER NOT NULL DEFAULT 0,
+  completed_at TEXT,
+  deleted_at TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS notes_completed_idx ON notes(completed);
 `;
 
 export async function initDatabase() {
   const sqlite = await SQLite.openDatabaseAsync('planakanm.db');
   await sqlite.execAsync(MIGRATION_SQL);
+
+  const noteAlarmMigrations = [
+    'ALTER TABLE notes ADD COLUMN has_alarm INTEGER NOT NULL DEFAULT 0',
+    'ALTER TABLE notes ADD COLUMN alarm_date TEXT',
+    'ALTER TABLE notes ADD COLUMN alarm_time TEXT',
+    'ALTER TABLE notes ADD COLUMN plan_id TEXT',
+  ];
+  for (const sql of noteAlarmMigrations) {
+    try {
+      await sqlite.execAsync(sql);
+    } catch {
+      // Column already exists.
+    }
+  }
+
   dbInstance = drizzle(sqlite, { schema });
   return dbInstance;
 }

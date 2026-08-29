@@ -38,7 +38,7 @@ export const lightTheme: ThemeColors = {
   overdue: '#D84315',
   snoozed: '#7B68EE',
   nowHighlight: '#FFF8E1',
-  completed: '#E8F5E9',
+  completed: '#F0E4B8',
   fab: '#9A7B1A',
   fabText: '#FFFFFF',
   statusBar: 'dark',
@@ -60,7 +60,7 @@ export const darkTheme: ThemeColors = {
   overdue: '#FF7043',
   snoozed: '#9575CD',
   nowHighlight: '#1A1508',
-  completed: '#1B2E1B',
+  completed: '#2A2212',
   fab: '#D4AF37',
   fabText: '#0A0A0A',
   statusBar: 'light',
@@ -84,13 +84,14 @@ export const radius = {
 } as const;
 
 import { FONT_FAMILY } from './fonts';
+import { rtlText } from './rtl';
 
 export const typography = {
-  display: { fontFamily: FONT_FAMILY, fontSize: 32 },
-  title: { fontFamily: FONT_FAMILY, fontSize: 20 },
-  body: { fontFamily: FONT_FAMILY, fontSize: 16 },
-  caption: { fontFamily: FONT_FAMILY, fontSize: 13 },
-  label: { fontFamily: FONT_FAMILY, fontSize: 15 },
+  display: { fontFamily: FONT_FAMILY, fontSize: 32, ...rtlText },
+  title: { fontFamily: FONT_FAMILY, fontSize: 20, ...rtlText },
+  body: { fontFamily: FONT_FAMILY, fontSize: 16, ...rtlText },
+  caption: { fontFamily: FONT_FAMILY, fontSize: 13, ...rtlText },
+  label: { fontFamily: FONT_FAMILY, fontSize: 15, ...rtlText },
 };
 
 export const motion = {

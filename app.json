@@ -11,6 +11,7 @@
       "expo-sqlite",
       "expo-font",
       "expo-localization",
+      "./plugins/withAndroidAlarmActivity.js",
       [
         "expo-notifications",
         {
@@ -21,7 +22,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.planakanm.app",
+      "bundleIdentifier": "com.planakanm.rekargroup",
       "infoPlist": {
         "UIBackgroundModes": ["fetch", "remote-notification"]
       }
@@ -33,12 +34,15 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.planakanm.app",
+      "package": "com.planakanm.rekargroup",
+      "supportsRtl": true,
       "permissions": [
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
+        "WAKE_LOCK",
         "SCHEDULE_EXACT_ALARM",
         "USE_EXACT_ALARM",
+        "USE_FULL_SCREEN_INTENT",
         "POST_NOTIFICATIONS"
       ],
       "predictiveBackGestureEnabled": false

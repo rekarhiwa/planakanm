@@ -4,6 +4,7 @@
   },
   "tabs": {
     "home": "الرئيسية",
+    "notes": "ملاحظات",
     "calendar": "التقويم",
     "stats": "الإحصائيات",
     "settings": "الإعدادات"
@@ -27,7 +28,11 @@
     "emptyTitle": "لا توجد خطط 🎯",
     "emptySubtitle": "حان الوقت لإضافة خطة.",
     "completeNow": "تم",
-    "snoozeNow": "تأجيل"
+    "snoozeNow": "تأجيل",
+    "dueNow": "الآن",
+    "remainingMinutes": "متبقي {{count}} دقيقة",
+    "remainingHoursOnly": "متبقي {{hours}} ساعة",
+    "remainingHours": "متبقي {{hours}} ساعة {{minutes}} دقيقة"
   },
   "create": {
     "title": "ماذا تريد أن تفعل؟",
@@ -42,13 +47,19 @@
     "monthly": "شهرياً",
     "yearly": "سنوياً",
     "addPlan": "إضافة الخطة",
+    "alarmTitle": "عنوان المنبه",
+    "alarmNote": "ملاحظة المنبه",
     "advanced": "المزيد",
     "category": "الفئة",
     "priority": "الأولوية",
     "notes": "ملاحظات",
+    "notesPlaceholder": "أضف ملاحظة (اختياري)...",
     "reminderType": "نوع التذكير",
     "notification": "إشعار",
-    "alarm": "منبه"
+    "alarm": "منبه",
+    "fullscreenAlarm": "منبه ملء الشاشة",
+    "fullscreenAlarmHint": "عند حلول الوقت، تفتح شاشة منبه كاملة.",
+    "notificationHint": "يظهر إشعار عادي فقط."
   },
   "snooze": {
     "title": "متى نذكرك؟",
@@ -62,7 +73,14 @@
     "2hours": "ساعتان",
     "tomorrow": "غداً",
     "custom": "وقت مخصص",
-    "doNow": "افعل الآن"
+    "doNow": "افعل الآن",
+    "customSection": "مخصص",
+    "byMinutes": "بالدقائق",
+    "byTime": "بالوقت",
+    "minutesLabel": "كم دقيقة لاحقاً؟",
+    "applyMinutes": "تأجيل بالدقائق",
+    "applyTime": "تأجيل لهذا الوقت",
+    "minuteUnit": "دقيقة"
   },
   "status": {
     "pending": "معلق",
@@ -89,7 +107,10 @@
     "time": "الوقت",
     "repeat": "التكرار",
     "category": "الفئة",
-    "notes": "ملاحظات"
+    "notes": "ملاحظات",
+    "notesPlaceholder": "أضف ملاحظة...",
+    "deleteTitle": "حذف الخطة",
+    "deleteMessage": "هل أنت متأكد من حذف هذه الخطة؟"
   },
   "calendar": {
     "week": "أسبوع",
@@ -132,15 +153,73 @@
     "themeSystem": "النظام",
     "notifications": "الإشعارات",
     "defaultReminder": "التذكير الافتراضي",
+    "defaultReminderHint": "هذا هو الافتراضي للخطط الجديدة. يمكنك تغييره لكل خطة.",
+    "permissionNotifications": "الإشعارات",
+    "permissionExactAlarm": "منبهات دقيقة",
+    "permissionFullScreen": "ملء الشاشة",
+    "permissionEnable": "تفعيل",
+    "permissionGranted": "مفعّل",
+    "permissionNeeded": "يحتاج إلى تفعيل",
+    "permissionOptional": "يُنصح بالتفعيل",
+    "alarmPermissionsTitle": "أذونات المنبه",
+    "alarmPermissionsDesc": "فعّل هذه الأذونات للمنبه بملء الشاشة. الزر يفتح شاشة الإذن مباشرة.",
+    "alarmPermissionsSamsungDesc": "على سامسونج، فعّل أيضاً استخدام البطارية بدون قيود لعمل المنبه بشكل صحيح.",
+    "permissionBattery": "بطارية بدون قيود (سامسونج)",
+    "profile": "الملف الشخصي",
+    "enableAllAlarmPermissions": "تفعيل كل الأذونات",
+    "enableNotifications": "تفعيل الإشعارات",
     "defaultSnooze": "التأجيل الافتراضي",
     "weekStart": "بداية الأسبوع",
     "timeFormat": "تنسيق الوقت",
     "export": "تصدير",
     "import": "استيراد",
+    "exportErrorTitle": "فشل التصدير",
+    "exportErrorMessage": "تعذر تصدير الخطط. حاول مرة أخرى.",
+    "importSuccessTitle": "اكتمل الاستيراد",
+    "importSuccessMessage": "تم استيراد {{count}} خطة بنجاح.",
+    "importErrorTitle": "فشل الاستيراد",
+    "importErrorMessage": "تعذر استيراد الخطط. تحقق من الملف وحاول مرة أخرى.",
+    "notificationRequiredTitle": "إذن الإشعارات",
+    "notificationRequiredMessage": "إذن الإشعارات مطلوب لعمل المنبهات.",
+    "allPermissionsReady": "جميع الأذونات مفعّلة",
+    "lockScreenHint": "تظهر الإشعارات والمنبهات على شاشة القفل. منبه ملء الشاشة يوقظ الشاشة.",
     "about": "حول",
     "version": "الإصدار"
   },
+  "about": {
+    "title": "حول",
+    "back": "رجوع",
+    "tagline": "تخطيط يومي وتذكيرات",
+    "versionLabel": "الإصدار {{version}}",
+    "openHint": "معلومات وميزات وشروط",
+    "footer": "خططي — صُمم لتبسيط يومك",
+    "pages": {
+      "app": "حول التطبيق",
+      "features": "الميزات",
+      "notifications": "الإشعارات وشاشة القفل",
+      "privacy": "الخصوصية",
+      "terms": "شروط الاستخدام"
+    },
+    "subtitles": {
+      "app": "الهدف والوصف العام",
+      "features": "ما يمكنك فعله",
+      "notifications": "كيف تظهر التنبيهات على القفل",
+      "privacy": "كيف تُحمى بياناتك",
+      "terms": "شروط الاستخدام"
+    },
+    "content": {
+      "app": "خططي تطبيق بسيط لتخطيط يومك.\n\nأنشئ خططاً وملاحظات ومنبهات، نظّمها بالفئات، ولا تفوّت ما يهمك.\n\nتبقى جميع بياناتك على جهازك دون حاجة لحساب أو إنترنت.",
+      "features": "• خطط يومية مع أو بدون وقت\n• منبه ملء الشاشة للمهام المهمة\n• ملاحظات مع منبه مرتبط\n• ملخص صباحي (8:00) ومسائي (6:00)\n• تكرار يومي وأسبوعي وشهري\n• فئات وفلاتر\n• تصدير واستيراد الخطط\n• كردي وعربي وإنجليزي\n• فاتح وداكن",
+      "notifications": "عند تفعيل جميع الأذونات:\n\n• تظهر الإشعارات على شاشة القفل\n• منبه ملء الشاشة يوقظ الشاشة ويشغّل الصوت\n• الملخص الصباحي يعرض عدد تذكيرات اليوم\n• الملخص المسائي فقط إذا بقيت خطط\n\nملاحظة: على بعض الهواتف (مثل سامسونج)، فعّل استخدام البطارية بدون قيود.",
+      "privacy": "خططي لا يجمع بياناتك الشخصية ولا يرسلها لخوادم.\n\n• تُخزَّن خططك وملاحظاتك على جهازك فقط\n• التصدير يحدث فقط عند اختيارك\n• إذن الإشعارات يُستخدم للتذكير فقط\n\nلا نبيع بياناتك ولا نشاركها مع أطراف ثالثة.",
+      "terms": "استخدام خططي يعني موافقتك على هذه الشروط:\n\n• يُقدَّم التطبيق كما هو\n• أنت مسؤول عن خططك ومنبهاتك\n• ننصح بعمل نسخة احتياطية عبر التصدير\n\nللأسئلة، تواصل معنا من الإعدادات."
+    }
+  },
   "onboarding": {
+    "profileTitle": "ما اسمك؟",
+    "profileDesc": "سننشئ ملفك الشخصي لتخصيص التطبيق.",
+    "namePlaceholder": "أدخل اسمك",
+    "next": "التالي",
     "step1Title": "خطط ليومك",
     "step1Desc": "أنشئ خططاً بسرعة لليوم أو الغد.",
     "step2Title": "لا تنسَ أبداً",
@@ -158,6 +237,7 @@
     "deleted": "تم حذف الخطة",
     "completed": "تم إكمال الخطة ✓",
     "confirm": "تأكيد",
+    "ok": "حسناً",
     "loading": "جاري التحميل..."
   },
   "notification": {
@@ -165,6 +245,52 @@
     "overdueTitle": "⏰ فات وقت «{{title}}»",
     "complete": "إكمال",
     "snooze": "تأجيل",
-    "open": "فتح"
+    "open": "فتح",
+    "dailyDigest": {
+      "morningTitle": "تذكيرات اليوم",
+      "morningBody": "لديك {{count}} تذكيرات اليوم",
+      "eveningTitle": "تذكيرات المساء",
+      "eveningBody": "لا يزال لديك {{count}} تذكيرات"
+    }
+  },
+  "categories": {
+    "title": "الفئات",
+    "hint": "أنشئ فئات لتنظيم خططك. لن تظهر في الصفحة الرئيسية حتى تضيف واحدة.",
+    "namePlaceholder": "اسم الفئة",
+    "add": "إضافة فئة",
+    "all": "الكل",
+    "none": "بدون فئة",
+    "deleteTitle": "حذف الفئة",
+    "deleteMessage": "حذف هذه الفئة؟ ستبقى الخطط بدونها."
+  },
+  "alarm": {
+    "fullscreenBadge": "منبه",
+    "snooze15": "تأجيل ١٥ دقيقة",
+    "customSnooze": "تأجيل مخصص",
+    "complete": "إكمال",
+    "dismiss": "إغلاق"
+  },
+  "notes": {
+    "screenTitle": "ملاحظات",
+    "sectionTitle": "ملاحظات",
+    "add": "ملاحظة جديدة",
+    "addTitle": "ملاحظة جديدة",
+    "addHint": "بدون تذكير — فقط للقراءة عند الفراغ",
+    "noteTitle": "عنوان الملاحظة",
+    "noteBody": "محتوى الملاحظة",
+    "hasAlarm": "المنبه مفعّل",
+    "addAlarm": "إضافة منبه",
+    "titlePlaceholder": "العنوان...",
+    "bodyPlaceholder": "اكتب ملاحظتك هنا...",
+    "save": "حفظ",
+    "back": "رجوع",
+    "untitled": "بدون عنوان",
+    "emptyTitle": "لا توجد ملاحظات بعد",
+    "empty": "أضف واحدة عندما تكون فارغاً.",
+    "completed": "منجز",
+    "deleteTitle": "حذف الملاحظة",
+    "deleteMessage": "هل أنت متأكد من حذف هذه الملاحظة؟",
+    "deleted": "تم حذف الملاحظة",
+    "convertHint": "اسحب لليمين للتحويل إلى خطة"
   }
 }

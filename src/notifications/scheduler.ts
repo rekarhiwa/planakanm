@@ -1,31 +1,55 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 import type { Plan } from '../domain/entities/types';
 import * as planRepo from '../data/repositories/planRepository';
 import { getScheduledDateTime } from '../utils/dates';
 import { areNotificationsAvailable } from './support';
+import { isFullscreenReminder } from './alarmBridge';
 
 type NotificationsModule = typeof import('expo-notifications');
 
 const MAX_SCHEDULED = 60;
+const HANDLED_ALARM_KEY = '@planakanm/handled-alarm-response';
 const noopSubscription = { remove: () => {} };
 
 let notificationsModule: NotificationsModule | null = null;
 
-async function loadNotifications(): Promise<NotificationsModule | null> {
+export async function loadNotifications(): Promise<NotificationsModule | null> {
   if (!areNotificationsAvailable()) return null;
   if (notificationsModule) return notificationsModule;
 
   try {
     notificationsModule = await import('expo-notifications');
+    const Notifications = notificationsModule;
     notificationsModule.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-        shouldShowBanner: true,
-        shouldShowList: true,
-      }),
+      handleNotification: async (notification) => {
+        const data = notification.request.content.data as {
+          planId?: string;
+          reminderType?: string;
+        };
+
+        const isAlarm = data.planId && isFullscreenReminder(data.reminderType);
+
+        if (isAlarm) {
+          return {
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: true,
+            shouldShowBanner: false,
+            shouldShowList: true,
+            priority: Notifications.AndroidNotificationPriority.MAX,
+          };
+        }
+
+        return {
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: true,
+          shouldShowBanner: true,
+          shouldShowList: true,
+        };
+      },
     });
     return notificationsModule;
   } catch {
@@ -46,23 +70,36 @@ export async function setupNotificationChannels() {
       name: 'Plan Reminders',
       importance: Notifications.AndroidImportance.DEFAULT,
       sound: 'default',
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     });
     await Notifications.setNotificationChannelAsync('plan_alarms', {
       name: 'Plan Alarms',
       importance: Notifications.AndroidImportance.MAX,
       sound: 'default',
-      vibrationPattern: [0, 250, 250, 250],
+      vibrationPattern: [0, 500, 250, 500, 250, 500],
+      bypassDnd: true,
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      enableVibrate: true,
+      enableLights: true,
+      lightColor: '#D4AF37',
     });
     await Notifications.setNotificationChannelAsync('overdue', {
       name: 'Overdue Plans',
       importance: Notifications.AndroidImportance.HIGH,
       sound: 'default',
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    });
+    await Notifications.setNotificationChannelAsync('daily_digest', {
+      name: 'Daily Summary',
+      importance: Notifications.AndroidImportance.DEFAULT,
+      sound: 'default',
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     });
   }
 
   await Notifications.setNotificationCategoryAsync('plan_actions', [
     { identifier: 'complete', buttonTitle: 'تەواو', options: { opensAppToForeground: true } },
-    { identifier: 'snooze_15', buttonTitle: '١٥ خولەک', options: { opensAppToForeground: true } },
+    { identifier: 'snooze_15', buttonTitle: '١٥ خولەک', options: { opensAppToForeground: false } },
     { identifier: 'open', buttonTitle: 'کردنەوە', options: { opensAppToForeground: true } },
   ]);
 }
@@ -74,8 +111,48 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   const { status: existing } = await Notifications.getPermissionsAsync();
   if (existing === 'granted') return true;
 
-  const { status } = await Notifications.requestPermissionsAsync();
+  const { status } = await Notifications.requestPermissionsAsync({
+    ios: {
+      allowAlert: true,
+      allowBadge: true,
+      allowSound: true,
+    },
+  });
   return status === 'granted';
+}
+
+export async function dismissPlanNotifications(planId: string): Promise<void> {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return;
+
+  const plan = await planRepo.getPlanById(planId);
+
+  if (plan?.notificationId) {
+    try {
+      await Notifications.dismissNotificationAsync(plan.notificationId);
+    } catch {
+      // Already dismissed.
+    }
+    try {
+      await Notifications.cancelScheduledNotificationAsync(plan.notificationId);
+    } catch {
+      // Already cancelled.
+    }
+  }
+
+  try {
+    const presented = await Notifications.getPresentedNotificationsAsync();
+    for (const notification of presented) {
+      const data = notification.request.content.data as { planId?: string };
+      if (data.planId === planId) {
+        await Notifications.dismissNotificationAsync(notification.request.identifier);
+      }
+    }
+  } catch {
+    // Not supported on this platform.
+  }
+
+  await planRepo.clearNotificationId(planId);
 }
 
 export async function schedulePlanNotification(plan: Plan): Promise<string | null> {
@@ -87,17 +164,28 @@ export async function schedulePlanNotification(plan: Plan): Promise<string | nul
   const scheduled = getScheduledDateTime(plan);
   if (!scheduled || scheduled.getTime() <= Date.now()) return null;
 
-  const channelId =
-    plan.reminderType === 'alarm' ? 'plan_alarms' : 'plan_reminders';
+  const isAlarm = plan.reminderType === 'alarm';
+  const channelId = isAlarm ? 'plan_alarms' : 'plan_reminders';
 
   const notificationId = await Notifications.scheduleNotificationAsync({
     content: {
       title: `⏰ ${plan.title}`,
-      body: plan.description ?? '',
-      data: { planId: plan.id, type: 'reminder' },
+      body: isAlarm ? 'کاتی پلانەکەت گەیشت' : (plan.description ?? ''),
+      data: {
+        planId: plan.id,
+        type: 'reminder',
+        reminderType: plan.reminderType,
+      },
       categoryIdentifier: 'plan_actions',
-      sound: plan.reminderType === 'alarm' ? 'default' : undefined,
-      ...(Platform.OS === 'android' ? { channelId } : {}),
+      sound: 'default',
+      priority: isAlarm ? Notifications.AndroidNotificationPriority.MAX : undefined,
+      sticky: false,
+      ...(Platform.OS === 'android'
+        ? {
+            channelId,
+            autoDismiss: !isAlarm,
+          }
+        : {}),
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -135,12 +223,19 @@ export async function scheduleOverdueNotification(plan: Plan): Promise<string | 
 }
 
 export async function cancelPlanNotifications(planId: string): Promise<void> {
+  await dismissPlanNotifications(planId);
+}
+
+async function cancelAllPlanScheduledNotifications(): Promise<void> {
   const Notifications = await loadNotifications();
   if (!Notifications) return;
 
-  const plan = await planRepo.getPlanById(planId);
-  if (plan?.notificationId) {
-    await Notifications.cancelScheduledNotificationAsync(plan.notificationId);
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+  for (const request of scheduled) {
+    const data = request.content.data as { type?: string; planId?: string };
+    if (data?.planId || data?.type === 'reminder' || data?.type === 'overdue') {
+      await Notifications.cancelScheduledNotificationAsync(request.identifier);
+    }
   }
 }
 
@@ -158,15 +253,56 @@ export async function reconcileAllNotifications(): Promise<void> {
 
   const toSchedule = pending.slice(0, MAX_SCHEDULED);
 
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  await cancelAllPlanScheduledNotifications();
 
   for (const plan of toSchedule) {
     await schedulePlanNotification(plan);
   }
+
+  const { refreshDailyDigests } = await import('./dailyDigest');
+  await refreshDailyDigests();
+}
+
+export async function clearLastNotificationResponse(): Promise<void> {
+  const Notifications = await loadNotifications();
+  if (!Notifications?.clearLastNotificationResponseAsync) return;
+  await Notifications.clearLastNotificationResponseAsync();
+}
+
+export async function consumePendingAlarmLaunch(): Promise<string | null> {
+  const Notifications = await loadNotifications();
+  if (!Notifications) return null;
+
+  const response = await Notifications.getLastNotificationResponseAsync();
+  if (!response) return null;
+
+  const data = response.notification.request.content.data as {
+    planId?: string;
+    reminderType?: string;
+  };
+
+  if (!data.planId || !isFullscreenReminder(data.reminderType)) {
+    return null;
+  }
+
+  const responseKey = `${response.notification.request.identifier}:${response.actionIdentifier}`;
+  const handled = await AsyncStorage.getItem(HANDLED_ALARM_KEY);
+  if (handled === responseKey) {
+    return null;
+  }
+
+  await AsyncStorage.setItem(HANDLED_ALARM_KEY, responseKey);
+
+  const actionId = response.actionIdentifier;
+  if (actionId === 'complete' || actionId === 'snooze_15') {
+    return null;
+  }
+
+  return data.planId;
 }
 
 export async function addNotificationResponseListener(
-  handler: (planId: string, action: string) => void,
+  handler: (planId: string, action: string, reminderType?: string) => void,
 ) {
   const Notifications = await loadNotifications();
   if (!Notifications) return noopSubscription;
@@ -174,16 +310,17 @@ export async function addNotificationResponseListener(
   return Notifications.addNotificationResponseReceivedListener((response) => {
     const data = response.notification.request.content.data as {
       planId?: string;
+      reminderType?: string;
     };
     const actionId = response.actionIdentifier;
     if (data.planId) {
-      handler(data.planId, actionId);
+      handler(data.planId, actionId, data.reminderType);
     }
   });
 }
 
 export async function addNotificationReceivedListener(
-  handler: (planId: string, type: string) => void,
+  handler: (planId: string, reminderType?: string) => void,
 ) {
   const Notifications = await loadNotifications();
   if (!Notifications) return noopSubscription;
@@ -191,10 +328,10 @@ export async function addNotificationReceivedListener(
   return Notifications.addNotificationReceivedListener((notification) => {
     const data = notification.request.content.data as {
       planId?: string;
-      type?: string;
+      reminderType?: string;
     };
     if (data.planId) {
-      handler(data.planId, data.type ?? 'reminder');
+      handler(data.planId, data.reminderType);
     }
   });
 }

@@ -19,7 +19,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     defaultReminderType: 'notification',
     defaultSnoozeMinutes: 15,
     weekStartsOn: 6,
-    timeFormat: '24h',
+    timeFormat: '12h',
     onboardingComplete: false,
     notificationsEnabled: true,
     vibrationEnabled: true,

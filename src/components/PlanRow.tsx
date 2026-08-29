@@ -1,12 +1,14 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 
-import type { Plan } from '../domain/entities/types';
+import type { Category, Plan } from '../domain/entities/types';
 import { radius, spacing, typography } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 
 interface PlanRowProps {
   plan: Plan;
+  category?: Category;
+  showCategory?: boolean;
   onPress?: () => void;
   onComplete?: () => void;
   onSnooze?: () => void;
@@ -16,6 +18,8 @@ interface PlanRowProps {
 
 export function PlanRow({
   plan,
+  category,
+  showCategory = false,
   onPress,
   onComplete,
   onSnooze,
@@ -26,7 +30,7 @@ export function PlanRow({
 
   const statusColor =
     plan.status === 'completed'
-      ? colors.success
+      ? colors.primaryMuted
       : plan.status === 'overdue'
         ? colors.overdue
         : plan.status === 'snoozed'
@@ -85,20 +89,30 @@ export function PlanRow({
       {!plan.hasTime && <Text style={[styles.bullet, { color: colors.primary }]}>•</Text>}
 
       <View style={styles.content}>
-        <Text
-          style={[
-            styles.title,
-            {
-              color: plan.status === 'completed' ? colors.textSecondary : colors.text,
-              textDecorationLine: plan.status === 'completed' ? 'line-through' : 'none',
-            },
-          ]}
-          numberOfLines={2}
-        >
-          {plan.title}
-        </Text>
-        {plan.status !== 'pending' && (
-          <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+        <View style={styles.titleRow}>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: plan.status === 'completed' ? colors.textSecondary : colors.text,
+                textDecorationLine: plan.status === 'completed' ? 'line-through' : 'none',
+              },
+            ]}
+            numberOfLines={2}
+          >
+            {plan.title}
+          </Text>
+          {plan.status !== 'pending' && (
+            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+          )}
+        </View>
+        {showCategory && category && (
+          <View style={[styles.categoryBadge, { backgroundColor: `${category.color}22` }]}>
+            <View style={[styles.categoryDot, { backgroundColor: category.color }]} />
+            <Text style={[styles.categoryText, { color: category.color }]} numberOfLines={1}>
+              {category.name}
+            </Text>
+          </View>
         )}
       </View>
 
@@ -148,14 +162,39 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    alignSelf: 'stretch',
+    justifyContent: 'flex-end',
   },
   title: {
     ...typography.body,
-    flex: 1,
     textAlign: 'right',
+    flexShrink: 1,
+  },
+  categoryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: radius.full,
+    maxWidth: '100%',
+  },
+  categoryDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  categoryText: {
+    ...typography.caption,
+    fontSize: 11,
+    maxWidth: 120,
   },
   statusDot: {
     width: 8,

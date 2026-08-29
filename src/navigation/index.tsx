@@ -5,46 +5,90 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text } from 'react-native';
 
+import { TabBarIcon } from '../components/TabBarIcon';
+import { CreatePlanScreen } from '../screens/CreatePlanScreen';
 import { CalendarScreen } from '../screens/CalendarScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { NoteEditorScreen } from '../screens/NoteEditorScreen';
+import { NotesScreen } from '../screens/NotesScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { PlanDetailScreen } from '../screens/PlanDetailScreen';
 import { SearchScreen } from '../screens/SearchScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { AboutScreen } from '../screens/AboutScreen';
+import { AboutContentScreen } from '../screens/AboutContentScreen';
 import { StatsScreen } from '../screens/StatsScreen';
+import type { AboutPageId } from '../screens/about/aboutPages';
+import { navigationRef, type RootStackParamList } from './navigationRef';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { FONT_FAMILY } from '../theme/fonts';
 import { useTheme } from '../theme/ThemeContext';
 
-export type RootStackParamList = {
-  Main: undefined;
-  PlanDetail: { planId: string };
-  Search: undefined;
-  Onboarding: undefined;
-};
+export type { RootStackParamList } from './navigationRef';
 
 export type TabParamList = {
   Home: undefined;
+  Notes: undefined;
   Calendar: undefined;
   Stats: undefined;
   Settings: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<TabParamList>();
-
-const TAB_ICONS: Record<string, string> = {
-  Home: '🏠',
-  Calendar: '📅',
-  Stats: '📊',
-  Settings: '⚙️',
+export type NotesStackParamList = {
+  NotesList: undefined;
+  NoteEditor: { noteId?: string } | undefined;
 };
 
-function TabIcon({ label, focused, color }: { label: string; focused: boolean; color: string }) {
-  return <Text style={{ fontSize: focused ? 22 : 20, color }}>{TAB_ICONS[label] ?? '•'}</Text>;
+export type SettingsStackParamList = {
+  SettingsList: undefined;
+  About: undefined;
+  AboutContent: { page: AboutPageId };
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
+const NotesStack = createNativeStackNavigator<NotesStackParamList>();
+const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
+
+function NotesNavigator() {
+  const { colors } = useTheme();
+
+  const screenOptions = useMemo<NativeStackNavigationOptions>(
+    () => ({
+      headerShown: false,
+      contentStyle: { backgroundColor: colors.background },
+    }),
+    [colors.background],
+  );
+
+  return (
+    <NotesStack.Navigator screenOptions={screenOptions}>
+      <NotesStack.Screen name="NotesList" component={NotesScreen} />
+      <NotesStack.Screen name="NoteEditor" component={NoteEditorScreen} />
+    </NotesStack.Navigator>
+  );
+}
+
+function SettingsNavigator() {
+  const { colors } = useTheme();
+
+  const screenOptions = useMemo<NativeStackNavigationOptions>(
+    () => ({
+      headerShown: false,
+      contentStyle: { backgroundColor: colors.background },
+    }),
+    [colors.background],
+  );
+
+  return (
+    <SettingsStack.Navigator screenOptions={screenOptions}>
+      <SettingsStack.Screen name="SettingsList" component={SettingsScreen} />
+      <SettingsStack.Screen name="About" component={AboutScreen} />
+      <SettingsStack.Screen name="AboutContent" component={AboutContentScreen} />
+    </SettingsStack.Navigator>
+  );
 }
 
 function MainTabs() {
@@ -73,8 +117,8 @@ function MainTabs() {
       tabBarActiveTintColor: colors.primary,
       tabBarInactiveTintColor: colors.textSecondary,
       tabBarLabelStyle,
-      tabBarIcon: ({ focused, color }) => (
-        <TabIcon label={route.name} focused={focused} color={color} />
+      tabBarIcon: ({ color }) => (
+        <TabBarIcon name={route.name} color={color} size={22} />
       ),
       tabBarLabel: t(`tabs.${route.name.toLowerCase()}`),
     }),
@@ -84,9 +128,10 @@ function MainTabs() {
   return (
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Notes" component={NotesNavigator} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Stats" component={StatsScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Settings" component={SettingsNavigator} />
     </Tab.Navigator>
   );
 }
@@ -94,9 +139,11 @@ function MainTabs() {
 export function AppNavigation() {
   const { colors, isDark } = useTheme();
   const onboardingComplete = useSettingsStore((s) => s.settings.onboardingComplete);
+  const userName = useSettingsStore((s) => s.settings.userName);
   const showOnboarding = useUIStore((s) => s.showOnboarding);
 
-  const needsOnboarding = !onboardingComplete || showOnboarding;
+  const needsProfile = !userName?.trim();
+  const needsOnboarding = needsProfile || !onboardingComplete || showOnboarding;
 
   const navigationTheme = useMemo<NavigationTheme>(
     () => ({
@@ -128,7 +175,7 @@ export function AppNavigation() {
   );
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
       <Stack.Navigator screenOptions={stackScreenOptions}>
         {needsOnboarding ? (
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
@@ -138,6 +185,11 @@ export function AppNavigation() {
             <Stack.Screen
               name="PlanDetail"
               component={PlanDetailScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="CreatePlan"
+              component={CreatePlanScreen}
               options={{ presentation: 'modal' }}
             />
             <Stack.Screen
