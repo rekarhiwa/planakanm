@@ -5,12 +5,11 @@ import type { Plan } from '../domain/entities/types';
 import * as planRepo from '../data/repositories/planRepository';
 import { getScheduledDateTime } from '../utils/dates';
 import { areNotificationsAvailable } from './support';
-import { isFullscreenReminder } from './alarmBridge';
 
 type NotificationsModule = typeof import('expo-notifications');
 
 const MAX_SCHEDULED = 60;
-const HANDLED_ALARM_KEY = '@planakanm/handled-alarm-response';
+const HANDLED_NOTIFICATION_KEY = '@planakanm/handled-notification-response';
 const noopSubscription = { remove: () => {} };
 
 let notificationsModule: NotificationsModule | null = null;
@@ -23,33 +22,13 @@ export async function loadNotifications(): Promise<NotificationsModule | null> {
     notificationsModule = await import('expo-notifications');
     const Notifications = notificationsModule;
     notificationsModule.setNotificationHandler({
-      handleNotification: async (notification) => {
-        const data = notification.request.content.data as {
-          planId?: string;
-          reminderType?: string;
-        };
-
-        const isAlarm = data.planId && isFullscreenReminder(data.reminderType);
-
-        if (isAlarm) {
-          return {
-            shouldShowAlert: true,
-            shouldPlaySound: true,
-            shouldSetBadge: true,
-            shouldShowBanner: false,
-            shouldShowList: true,
-            priority: Notifications.AndroidNotificationPriority.MAX,
-          };
-        }
-
-        return {
-          shouldShowAlert: true,
-          shouldPlaySound: true,
-          shouldSetBadge: true,
-          shouldShowBanner: true,
-          shouldShowList: true,
-        };
-      },
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
     });
     return notificationsModule;
   } catch {
@@ -164,26 +143,21 @@ export async function schedulePlanNotification(plan: Plan): Promise<string | nul
   const scheduled = getScheduledDateTime(plan);
   if (!scheduled || scheduled.getTime() <= Date.now()) return null;
 
-  const isAlarm = plan.reminderType === 'alarm';
-  const channelId = isAlarm ? 'plan_alarms' : 'plan_reminders';
-
   const notificationId = await Notifications.scheduleNotificationAsync({
     content: {
-      title: `⏰ ${plan.title}`,
-      body: isAlarm ? 'کاتی پلانەکەت گەیشت' : (plan.description ?? ''),
+      title: plan.title,
+      body: plan.description ?? 'کاتی پلانەکەت گەیشت',
       data: {
         planId: plan.id,
         type: 'reminder',
-        reminderType: plan.reminderType,
+        reminderType: 'notification',
       },
       categoryIdentifier: 'plan_actions',
       sound: 'default',
-      priority: isAlarm ? Notifications.AndroidNotificationPriority.MAX : undefined,
-      sticky: false,
       ...(Platform.OS === 'android'
         ? {
-            channelId,
-            autoDismiss: !isAlarm,
+            channelId: 'plan_reminders',
+            autoDismiss: true,
           }
         : {}),
     },
@@ -269,7 +243,7 @@ export async function clearLastNotificationResponse(): Promise<void> {
   await Notifications.clearLastNotificationResponseAsync();
 }
 
-export async function consumePendingAlarmLaunch(): Promise<string | null> {
+export async function consumePendingNotificationLaunch(): Promise<string | null> {
   const Notifications = await loadNotifications();
   if (!Notifications) return null;
 
@@ -278,20 +252,20 @@ export async function consumePendingAlarmLaunch(): Promise<string | null> {
 
   const data = response.notification.request.content.data as {
     planId?: string;
-    reminderType?: string;
+    type?: string;
   };
 
-  if (!data.planId || !isFullscreenReminder(data.reminderType)) {
+  if (!data.planId || data.type === 'daily_digest') {
     return null;
   }
 
   const responseKey = `${response.notification.request.identifier}:${response.actionIdentifier}`;
-  const handled = await AsyncStorage.getItem(HANDLED_ALARM_KEY);
+  const handled = await AsyncStorage.getItem(HANDLED_NOTIFICATION_KEY);
   if (handled === responseKey) {
     return null;
   }
 
-  await AsyncStorage.setItem(HANDLED_ALARM_KEY, responseKey);
+  await AsyncStorage.setItem(HANDLED_NOTIFICATION_KEY, responseKey);
 
   const actionId = response.actionIdentifier;
   if (actionId === 'complete' || actionId === 'snooze_15') {
@@ -301,8 +275,11 @@ export async function consumePendingAlarmLaunch(): Promise<string | null> {
   return data.planId;
 }
 
+/** @deprecated Use consumePendingNotificationLaunch */
+export const consumePendingAlarmLaunch = consumePendingNotificationLaunch;
+
 export async function addNotificationResponseListener(
-  handler: (planId: string, action: string, reminderType?: string) => void,
+  handler: (planId: string, action: string) => void,
 ) {
   const Notifications = await loadNotifications();
   if (!Notifications) return noopSubscription;
@@ -310,28 +287,10 @@ export async function addNotificationResponseListener(
   return Notifications.addNotificationResponseReceivedListener((response) => {
     const data = response.notification.request.content.data as {
       planId?: string;
-      reminderType?: string;
     };
     const actionId = response.actionIdentifier;
     if (data.planId) {
-      handler(data.planId, actionId, data.reminderType);
-    }
-  });
-}
-
-export async function addNotificationReceivedListener(
-  handler: (planId: string, reminderType?: string) => void,
-) {
-  const Notifications = await loadNotifications();
-  if (!Notifications) return noopSubscription;
-
-  return Notifications.addNotificationReceivedListener((notification) => {
-    const data = notification.request.content.data as {
-      planId?: string;
-      reminderType?: string;
-    };
-    if (data.planId) {
-      handler(data.planId, data.reminderType);
+      handler(data.planId, actionId);
     }
   });
 }

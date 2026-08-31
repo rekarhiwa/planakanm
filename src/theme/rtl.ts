@@ -1,22 +1,39 @@
 import { I18nManager, type TextStyle, type ViewStyle } from 'react-native';
 
-export const isRTL = I18nManager.isRTL;
+export function getIsRTL(): boolean {
+  return I18nManager.isRTL;
+}
 
-/** Logical start edge for Kurdish/Arabic (right) or LTR (left). */
-export const textAlignStart: TextStyle['textAlign'] = isRTL ? 'right' : 'left';
+export function rtlTextStyle(): TextStyle {
+  const rtl = getIsRTL();
+  return {
+    textAlign: rtl ? 'right' : 'left',
+    writingDirection: rtl ? 'rtl' : 'ltr',
+  };
+}
 
-/** Logical end edge alignment. */
-export const textAlignEnd: TextStyle['textAlign'] = isRTL ? 'left' : 'right';
+/** @deprecated Use rtlTextStyle() for runtime-correct direction. */
+export const rtlText: TextStyle = rtlTextStyle();
 
-export const writingDirection: TextStyle['writingDirection'] = isRTL ? 'rtl' : 'ltr';
+export const textAlignStart: TextStyle['textAlign'] = getIsRTL() ? 'right' : 'left';
+export const textAlignEnd: TextStyle['textAlign'] = getIsRTL() ? 'left' : 'right';
+export const writingDirection: TextStyle['writingDirection'] = getIsRTL() ? 'rtl' : 'ltr';
+export const rowDirection: ViewStyle['flexDirection'] = getIsRTL() ? 'row-reverse' : 'row';
+export const alignItemsStart: ViewStyle['alignItems'] = getIsRTL() ? 'flex-end' : 'flex-start';
+export const alignItemsEnd: ViewStyle['alignItems'] = getIsRTL() ? 'flex-start' : 'flex-end';
 
-export const rtlText: TextStyle = {
-  textAlign: textAlignStart,
-  writingDirection,
-};
+export function layoutRow(): ViewStyle['flexDirection'] {
+  return getIsRTL() ? 'row-reverse' : 'row';
+}
 
-export const rowDirection: ViewStyle['flexDirection'] = isRTL ? 'row-reverse' : 'row';
+export function layoutAlignEnd(): ViewStyle['alignItems'] {
+  return getIsRTL() ? 'flex-start' : 'flex-end';
+}
 
-export const alignItemsStart: ViewStyle['alignItems'] = isRTL ? 'flex-end' : 'flex-start';
+export function edgeStart(): 'left' | 'right' {
+  return getIsRTL() ? 'right' : 'left';
+}
 
-export const alignItemsEnd: ViewStyle['alignItems'] = isRTL ? 'flex-start' : 'flex-end';
+export function edgeEnd(): 'left' | 'right' {
+  return getIsRTL() ? 'left' : 'right';
+}

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { Category } from '../domain/entities/types';
 import { useDialogStore } from '../stores/dialogStore';
 import { usePlanStore } from '../stores/planStore';
 import { radius, spacing, typography } from '../theme/colors';
-import { FONT_FAMILY } from '../theme/fonts';
+import { FontTextInput } from './FontTextInput';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 const CATEGORY_COLORS = [
@@ -26,6 +27,7 @@ export function CategoryManager() {
   const categories = usePlanStore((s) => s.categories);
   const createCategory = usePlanStore((s) => s.createCategory);
   const deleteCategory = usePlanStore((s) => s.deleteCategory);
+  const rtl = rtlTextStyle();
 
   const [name, setName] = useState('');
   const [selectedColor, setSelectedColor] = useState(CATEGORY_COLORS[0]);
@@ -54,13 +56,13 @@ export function CategoryManager() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.hint, { color: colors.textSecondary }]}>{t('categories.hint')}</Text>
+      <Text style={[styles.hint, { color: colors.textSecondary }, rtl]}>{t('categories.hint')}</Text>
 
-      <TextInput
+      <FontTextInput
         value={name}
         onChangeText={setName}
         placeholder={t('categories.namePlaceholder')}
-        placeholderTextColor={colors.textSecondary}
+        placeholderColor={colors.textSecondary}
         style={[
           styles.input,
           {
@@ -91,7 +93,7 @@ export function CategoryManager() {
         }}
         style={[styles.addBtn, { backgroundColor: colors.primary }]}
       >
-        <Text style={{ color: colors.fabText, ...typography.label }}>{t('categories.add')}</Text>
+        <Text style={[{ color: colors.fabText, ...typography.label }, rtl]}>{t('categories.add')}</Text>
       </Pressable>
 
       {categories.length > 0 && (
@@ -103,7 +105,7 @@ export function CategoryManager() {
             >
               <View style={styles.itemLeft}>
                 <View style={[styles.itemDot, { backgroundColor: category.color }]} />
-                <Text style={{ color: colors.text, ...typography.label }}>{category.name}</Text>
+                <Text style={[{ color: colors.text, ...typography.label }, rtl]}>{category.name}</Text>
               </View>
               <Pressable
                 onPress={() => {
@@ -111,7 +113,7 @@ export function CategoryManager() {
                 }}
                 hitSlop={8}
               >
-                <Text style={{ color: colors.danger, ...typography.caption }}>{t('common.delete')}</Text>
+                <Text style={[{ color: colors.danger, ...typography.caption }, rtl]}>{t('common.delete')}</Text>
               </Pressable>
             </View>
           ))}
@@ -122,21 +124,21 @@ export function CategoryManager() {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: spacing.sm },
-  hint: { ...typography.caption, textAlign: 'right', lineHeight: 18 },
+  container: { gap: spacing.sm, width: '100%' },
+  hint: { ...typography.caption, lineHeight: 18, width: '100%' },
   input: {
-    fontFamily: FONT_FAMILY,
     borderWidth: 1,
     borderRadius: radius.md,
     padding: spacing.md,
-    textAlign: 'right',
     fontSize: 15,
+    width: '100%',
   },
   colorRow: {
-    flexDirection: 'row',
+    flexDirection: layoutRow(),
     flexWrap: 'wrap',
     gap: spacing.sm,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
+    width: '100%',
   },
   colorDot: {
     width: 24,
@@ -147,18 +149,20 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radius.md,
     alignItems: 'center',
+    width: '100%',
   },
-  list: { gap: spacing.sm, marginTop: spacing.sm },
+  list: { gap: spacing.sm, marginTop: spacing.sm, width: '100%' },
   item: {
-    flexDirection: 'row',
+    flexDirection: layoutRow(),
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
     borderRadius: radius.md,
     padding: spacing.md,
+    width: '100%',
   },
   itemLeft: {
-    flexDirection: 'row',
+    flexDirection: layoutRow(),
     alignItems: 'center',
     gap: spacing.sm,
     flex: 1,

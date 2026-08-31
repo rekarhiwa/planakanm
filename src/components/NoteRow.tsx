@@ -4,6 +4,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { AlarmIcon } from './AlarmIcon';
 import type { Note } from '../domain/entities/types';
 import { radius, spacing, typography } from '../theme/colors';
+import { layoutRow } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface NoteRowProps {
@@ -32,6 +33,7 @@ export function NoteRow({ note, onPress, onToggleComplete, onDelete }: NoteRowPr
       <View
         style={[
           styles.row,
+          { flexDirection: layoutRow() },
           {
             backgroundColor: note.completed ? colors.completed : colors.surface,
             borderColor: colors.border,
@@ -53,7 +55,7 @@ export function NoteRow({ note, onPress, onToggleComplete, onDelete }: NoteRowPr
         </Pressable>
 
         <Pressable onPress={onPress} style={styles.content}>
-          <View style={styles.titleRow}>
+          <View style={[styles.titleRow, { flexDirection: layoutRow() }]}>
             {note.hasAlarm ? (
               <AlarmIcon color={colors.primary} size={14} />
             ) : null}
@@ -78,7 +80,6 @@ export function NoteRow({ note, onPress, onToggleComplete, onDelete }: NoteRowPr
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     paddingVertical: spacing.md,
@@ -92,7 +93,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   titleRow: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     maxWidth: '100%',

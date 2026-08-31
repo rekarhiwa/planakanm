@@ -27,7 +27,7 @@ import { useNoteStore } from '../stores/noteStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { radius, spacing, typography } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
-import { rtlText } from '../theme/rtl';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { formatTimeDisplay, getTodayISO } from '../utils/dates';
 
@@ -124,9 +124,11 @@ export function NoteEditorScreen() {
     navigation.goBack();
   }, [navigation, persistNote]);
 
+  const rtl = rtlTextStyle();
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, flexDirection: layoutRow() }]}>
         <Pressable onPress={() => { void handleBack(); }} hitSlop={12} style={styles.headerBtn}>
           <Text style={[styles.headerAction, { color: colors.primary }]}>{t('notes.back')}</Text>
         </Pressable>
@@ -164,10 +166,10 @@ export function NoteEditorScreen() {
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.block}>
-            <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('notes.noteTitle')}</Text>
+          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+            <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('notes.noteTitle')}</Text>
             <FontTextInput
-              style={[styles.titleInput, { color: colors.text }, rtlText]}
+              style={[styles.titleInput, { color: colors.text }]}
               placeholder={t('notes.titlePlaceholder')}
               placeholderColor={colors.textSecondary}
               value={title}
@@ -180,14 +182,13 @@ export function NoteEditorScreen() {
             />
           </View>
 
-          <View style={styles.block}>
-            <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('notes.noteBody')}</Text>
+          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+            <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('notes.noteBody')}</Text>
             <FontTextInput
               ref={bodyRef}
               style={[
                 styles.bodyInput,
                 { color: colors.text, backgroundColor: colors.surfaceElevated },
-                rtlText,
               ]}
               placeholder={t('notes.bodyPlaceholder')}
               placeholderColor={colors.textSecondary}
@@ -233,7 +234,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
   fieldLabel: {
     ...typography.caption,
     fontWeight: '600',
+    alignSelf: 'stretch',
   },
   titleInput: {
     fontFamily: FONT_FAMILY,
@@ -276,6 +277,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 36,
     paddingVertical: spacing.xs,
+    width: '100%',
+    alignSelf: 'stretch',
   },
   bodyInput: {
     fontFamily: FONT_FAMILY,
@@ -284,6 +287,8 @@ const styles = StyleSheet.create({
     minHeight: BODY_MIN_HEIGHT,
     borderRadius: radius.lg,
     padding: spacing.lg,
+    width: '100%',
+    alignSelf: 'stretch',
   },
   alarmBlock: {
     gap: spacing.lg,

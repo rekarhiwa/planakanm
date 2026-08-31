@@ -18,16 +18,14 @@ import { Chip } from '../components/Chip';
 import { DateSelector } from '../components/DateSelector';
 import { FontTextInput } from '../components/FontTextInput';
 import { getDefaultTimeValue, TimePicker } from '../components/TimePicker';
-import type { PlanPriority, RepeatType, ReminderType } from '../domain/entities/types';
+import type { PlanPriority, RepeatType } from '../domain/entities/types';
 import { parseNaturalLanguage, parsedToCreateInput } from '../domain/services/nlpParser';
 import type { RootStackParamList } from '../navigation';
-import { getPermissionStatus, requestAllAlarmPermissions } from '../permissions';
-import { useDialogStore } from '../stores/dialogStore';
 import { usePlanStore } from '../stores/planStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { radius, spacing, typography } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
-import { rtlText } from '../theme/rtl';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { formatTime24, formatTimeDisplay, getTodayISO } from '../utils/dates';
 
@@ -40,7 +38,6 @@ export function CreatePlanScreen() {
 
   const createPlan = usePlanStore((s) => s.createPlan);
   const categories = usePlanStore((s) => s.categories);
-  const defaultReminderType = useSettingsStore((s) => s.settings.defaultReminderType);
   const timeFormat = useSettingsStore((s) => s.settings.timeFormat);
 
   const [title, setTitle] = useState('');
@@ -48,7 +45,6 @@ export function CreatePlanScreen() {
   const [time, setTime] = useState(getDefaultTimeValue());
   const [repeatType, setRepeatType] = useState<RepeatType>('none');
   const [priority, setPriority] = useState<PlanPriority>('normal');
-  const [reminderType, setReminderType] = useState<ReminderType>(defaultReminderType);
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const [notes, setNotes] = useState('');
   const [nlpPreview, setNlpPreview] = useState<string | null>(null);
@@ -60,10 +56,9 @@ export function CreatePlanScreen() {
     setTime(getDefaultTimeValue());
     setRepeatType('none');
     setPriority('normal');
-    setReminderType(defaultReminderType);
     setCategoryId(undefined);
     setNlpPreview(null);
-  }, [prefill, defaultReminderType]);
+  }, [prefill]);
 
   const timePreview = useMemo(() => {
     const [hourPart, minutePart] = time.split(':');
@@ -88,32 +83,13 @@ export function CreatePlanScreen() {
     }
   };
 
-  const handleReminderTypeChange = async (nextType: ReminderType) => {
-    setReminderType(nextType);
-    if (nextType !== 'alarm') return;
-
-    const status = await getPermissionStatus();
-    if (status.notifications) return;
-
-    const confirmed = await useDialogStore.getState().showConfirm({
-      title: t('settings.alarmPermissionsTitle'),
-      message: t('settings.alarmPermissionsDesc'),
-      confirmLabel: t('settings.enableAllAlarmPermissions'),
-      accent: 'warning',
-    });
-
-    if (confirmed) {
-      await requestAllAlarmPermissions();
-    }
-  };
-
   const handleSubmit = async () => {
     if (!title.trim()) return;
 
     let input;
     const parsed = parseNaturalLanguage(title);
     if (parsed.confidence === 'high') {
-      input = parsedToCreateInput(parsed);
+      input = { ...parsedToCreateInput(parsed), reminderType: 'notification' as const };
     } else {
       input = {
         title: title.trim(),
@@ -123,35 +99,20 @@ export function CreatePlanScreen() {
         hasTime: true,
         repeatType,
         priority,
-        reminderType,
+        reminderType: 'notification' as const,
         categoryId,
       };
-    }
-
-    if (reminderType === 'alarm') {
-      const status = await getPermissionStatus();
-      if (!status.notifications) {
-        const confirmed = await useDialogStore.getState().showConfirm({
-          title: t('settings.alarmPermissionsTitle'),
-          message: t('settings.alarmPermissionsDesc'),
-          confirmLabel: t('settings.enableAllAlarmPermissions'),
-          accent: 'warning',
-        });
-
-        if (confirmed) {
-          await requestAllAlarmPermissions();
-        }
-        return;
-      }
     }
 
     await createPlan(input);
     navigation.goBack();
   };
 
+  const rtl = rtlTextStyle();
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, flexDirection: layoutRow() }]}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={styles.headerBtn}>
           <Text style={[styles.headerAction, { color: colors.primary }]}>{t('notes.back')}</Text>
         </Pressable>
@@ -187,10 +148,10 @@ export function CreatePlanScreen() {
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.block}>
-            <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.alarmTitle')}</Text>
+          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+            <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.alarmTitle')}</Text>
             <FontTextInput
-              style={[styles.titleInput, { color: colors.text }, rtlText]}
+              style={[styles.titleInput, { color: colors.text }]}
               placeholder={t('create.placeholder')}
               placeholderColor={colors.textSecondary}
               value={title}
@@ -202,13 +163,12 @@ export function CreatePlanScreen() {
             ) : null}
           </View>
 
-          <View style={styles.block}>
-            <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.alarmNote')}</Text>
+          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+            <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.alarmNote')}</Text>
             <FontTextInput
               style={[
                 styles.notesInput,
                 { color: colors.text, backgroundColor: colors.surfaceElevated },
-                rtlText,
               ]}
               placeholder={t('create.notesPlaceholder')}
               placeholderColor={colors.textSecondary}
@@ -273,7 +233,7 @@ export function CreatePlanScreen() {
             </View>
 
             <View style={styles.optionSection}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.priority')}</Text>
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.priority')}</Text>
               <View style={styles.chipRow}>
                 {(['low', 'normal', 'high', 'urgent'] as PlanPriority[]).map((p) => (
                   <Chip
@@ -284,17 +244,6 @@ export function CreatePlanScreen() {
                   />
                 ))}
               </View>
-            </View>
-
-            <View style={styles.optionSection}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.reminderType')}</Text>
-              <View style={styles.chipRow}>
-                <Chip label={t('create.notification')} selected={reminderType === 'notification'} onPress={() => setReminderType('notification')} />
-                <Chip label={t('create.fullscreenAlarm')} selected={reminderType === 'alarm'} onPress={() => { void handleReminderTypeChange('alarm'); }} />
-              </View>
-              <Text style={[styles.reminderHint, { color: colors.textSecondary }]}>
-                {reminderType === 'alarm' ? t('create.fullscreenAlarmHint') : t('create.notificationHint')}
-              </Text>
             </View>
           </View>
 
@@ -319,7 +268,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
@@ -354,6 +302,7 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontWeight: '600',
     marginBottom: spacing.xs,
+    alignSelf: 'stretch',
   },
   titleInput: {
     fontFamily: FONT_FAMILY,
@@ -361,6 +310,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 34,
     paddingVertical: spacing.xs,
+    width: '100%',
+    alignSelf: 'stretch',
   },
   nlpPreview: {
     ...typography.caption,
@@ -372,6 +323,8 @@ const styles = StyleSheet.create({
     minHeight: 88,
     borderRadius: radius.lg,
     padding: spacing.lg,
+    width: '100%',
+    alignSelf: 'stretch',
   },
   dateSelectorWrap: {
     marginHorizontal: -spacing.xl,

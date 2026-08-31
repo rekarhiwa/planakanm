@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { spacing, typography } from '../theme/colors';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface ScreenHeaderProps {
@@ -15,20 +16,21 @@ interface ScreenHeaderProps {
 
 export function ScreenHeader({ title, onBack, backLabel = '←', rightAction }: ScreenHeaderProps) {
   const { colors } = useTheme();
+  const rtl = rtlTextStyle();
 
   return (
     <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background }]}>
       <Pressable onPress={onBack} hitSlop={12} style={styles.side}>
-        <Text style={[styles.back, { color: colors.primary }]}>{backLabel}</Text>
+        <Text style={[styles.back, { color: colors.primary }, rtl]}>{backLabel}</Text>
       </Pressable>
 
-      <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+      <Text style={[styles.title, { color: colors.text }, rtl]} numberOfLines={1}>
         {title}
       </Text>
 
       {rightAction ? (
         <Pressable onPress={rightAction.onPress} hitSlop={12} style={styles.side}>
-          <Text style={[styles.back, { color: colors.primary, fontWeight: '600' }]}>{rightAction.label}</Text>
+          <Text style={[styles.back, { color: colors.primary, fontWeight: '600' }, rtl]}>{rightAction.label}</Text>
         </Pressable>
       ) : (
         <View style={styles.side} />
@@ -39,7 +41,7 @@ export function ScreenHeader({ title, onBack, backLabel = '←', rightAction }: 
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
+    flexDirection: layoutRow(),
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,

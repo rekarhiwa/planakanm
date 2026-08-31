@@ -1,4 +1,5 @@
 import 'react-native-get-random-values';
+import './src/bootstrap/rtl';
 import { registerRootComponent } from 'expo';
 
 import App from './App';

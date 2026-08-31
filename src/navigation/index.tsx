@@ -17,9 +17,7 @@ import { PlanDetailScreen } from '../screens/PlanDetailScreen';
 import { SearchScreen } from '../screens/SearchScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { AboutScreen } from '../screens/AboutScreen';
-import { AboutContentScreen } from '../screens/AboutContentScreen';
 import { StatsScreen } from '../screens/StatsScreen';
-import type { AboutPageId } from '../screens/about/aboutPages';
 import { navigationRef, type RootStackParamList } from './navigationRef';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
@@ -44,7 +42,6 @@ export type NotesStackParamList = {
 export type SettingsStackParamList = {
   SettingsList: undefined;
   About: undefined;
-  AboutContent: { page: AboutPageId };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -86,7 +83,6 @@ function SettingsNavigator() {
     <SettingsStack.Navigator screenOptions={screenOptions}>
       <SettingsStack.Screen name="SettingsList" component={SettingsScreen} />
       <SettingsStack.Screen name="About" component={AboutScreen} />
-      <SettingsStack.Screen name="AboutContent" component={AboutContentScreen} />
     </SettingsStack.Navigator>
   );
 }

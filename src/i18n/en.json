@@ -169,6 +169,7 @@
     "enableAllAlarmPermissions": "Enable all permissions",
     "enableNotifications": "Enable notifications",
     "defaultSnooze": "Default snooze",
+    "snoozeMinutes": "{{count}} min",
     "weekStart": "Week starts on",
     "timeFormat": "Time format",
     "export": "Export",
@@ -189,31 +190,8 @@
   "about": {
     "title": "About",
     "back": "Back",
-    "tagline": "Daily planning and reminders",
-    "versionLabel": "Version {{version}}",
-    "openHint": "Info, features, and terms",
-    "footer": "Planakanm — built to simplify your day",
-    "pages": {
-      "app": "About the app",
-      "features": "Features",
-      "notifications": "Notifications & lock screen",
-      "privacy": "Privacy",
-      "terms": "Terms of use"
-    },
-    "subtitles": {
-      "app": "Purpose and overview",
-      "features": "What you can do",
-      "notifications": "How lock screen alerts work",
-      "privacy": "How your data is protected",
-      "terms": "Terms of use"
-    },
-    "content": {
-      "app": "Planakanm is a simple daily planning app.\n\nCreate plans, notes, and alarms, organize with categories, and never miss what matters.\n\nAll your data stays on your device. No account or internet required.",
-      "features": "• Daily plans with or without time\n• Full-screen alarms for important tasks\n• Notes with linked alarms\n• Morning (8:00) and evening (6:00) digests\n• Daily, weekly, monthly repeats\n• Categories and filters\n• Export and import plans\n• Kurdish, Arabic, and English\n• Light and dark themes",
-      "notifications": "When all permissions are enabled:\n\n• Notifications appear on the lock screen\n• Full-screen alarms wake the display and play sound\n• Morning digest shows today's reminder count\n• Evening digest only if plans remain\n\nNote: On some phones (e.g. Samsung), enable unrestricted battery use so alarms work in the background.",
-      "privacy": "Planakanm does not collect or send personal data to servers.\n\n• Plans and notes are stored only on your device\n• Export happens only when you choose\n• Notification permission is used only for reminders\n\nWe do not sell or share your data with third parties.",
-      "terms": "Using Planakanm means you agree to these terms:\n\n• The app is provided as-is\n• You are responsible for your plans and alarms\n• We recommend backing up via export\n\nIf you have questions, contact us through Settings."
-    }
+    "description": "This app was created to help you remember your plans and complete them on time.",
+    "versionLabel": "Version {{version}}"
   },
   "onboarding": {
     "profileTitle": "What's your name?",

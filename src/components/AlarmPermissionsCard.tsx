@@ -10,6 +10,7 @@ import {
   type PermissionStatus,
 } from '../permissions';
 import { radius, spacing, typography } from '../theme/colors';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface AlarmPermissionsCardProps {
@@ -20,6 +21,7 @@ interface AlarmPermissionsCardProps {
 export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCardProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const rtl = rtlTextStyle();
 
   const handleEnableAll = useCallback(async () => {
     await requestAllAlarmPermissions();
@@ -36,9 +38,9 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
 
   if (Platform.OS !== 'android') {
     return (
-      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>{t('settings.alarmPermissionsTitle')}</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, alignItems: layoutAlignEnd() }]}>
+        <Text style={[styles.title, { color: colors.text }, rtl]}>{t('settings.alarmPermissionsTitle')}</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }, rtl]}>
           {status.notifications ? t('settings.permissionGranted') : t('settings.permissionNeeded')}
         </Text>
         {!status.notifications ? (
@@ -46,14 +48,14 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
             onPress={() => handleEnableOne('notifications')}
             style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
           >
-            <Text style={[styles.primaryBtnText, { color: colors.fabText }]}>
+            <Text style={[styles.primaryBtnText, { color: colors.fabText }, rtl]}>
               {t('settings.enableNotifications')}
             </Text>
           </Pressable>
         ) : (
           <View style={[styles.successBox, { backgroundColor: colors.nowHighlight, borderColor: colors.success }]}>
-            <Text style={[styles.successTitle, { color: colors.success }]}>✓ {t('settings.allPermissionsReady')}</Text>
-            <Text style={[styles.successHint, { color: colors.textSecondary }]}>{t('settings.lockScreenHint')}</Text>
+            <Text style={[styles.successTitle, { color: colors.success }, rtl]}>✓ {t('settings.allPermissionsReady')}</Text>
+            <Text style={[styles.successHint, { color: colors.textSecondary }, rtl]}>{t('settings.lockScreenHint')}</Text>
           </View>
         )}
       </View>
@@ -71,11 +73,6 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
       label: t('settings.permissionExactAlarm'),
       granted: status.exactAlarm,
     },
-    {
-      key: 'fullScreen',
-      label: t('settings.permissionFullScreen'),
-      granted: status.fullScreen,
-    },
   ];
 
   if (status.isSamsung) {
@@ -89,10 +86,10 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
   const allGranted = rows.every((row) => row.granted);
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.nowHighlight, borderColor: colors.primary }]}>
+    <View style={[styles.card, { backgroundColor: colors.nowHighlight, borderColor: colors.primary, alignItems: layoutAlignEnd() }]}>
       <AlarmIcon color={colors.primary} size={32} />
-      <Text style={[styles.title, { color: colors.text }]}>{t('settings.alarmPermissionsTitle')}</Text>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+      <Text style={[styles.title, { color: colors.text }, rtl]}>{t('settings.alarmPermissionsTitle')}</Text>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }, rtl]}>
         {status.isSamsung ? t('settings.alarmPermissionsSamsungDesc') : t('settings.alarmPermissionsDesc')}
       </Text>
 
@@ -102,8 +99,8 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
           style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border }]}
         >
           <View style={styles.rowText}>
-            <Text style={{ color: colors.text, ...typography.label }}>{row.label}</Text>
-            <Text style={{ color: row.granted ? colors.success : colors.warning, ...typography.caption }}>
+            <Text style={[{ color: colors.text, ...typography.label }, rtl]}>{row.label}</Text>
+            <Text style={[{ color: row.granted ? colors.success : colors.warning, ...typography.caption }, rtl]}>
               {row.granted ? `✓ ${t('settings.permissionGranted')}` : t('settings.permissionNeeded')}
             </Text>
           </View>
@@ -112,7 +109,7 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
               onPress={() => handleEnableOne(row.key)}
               style={[styles.rowBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.fabText, ...typography.caption }}>
+              <Text style={[{ color: colors.fabText, ...typography.caption }, rtl]}>
                 {t('settings.permissionEnable')}
               </Text>
             </Pressable>
@@ -125,14 +122,14 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
           onPress={handleEnableAll}
           style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
         >
-          <Text style={[styles.primaryBtnText, { color: colors.fabText }]}>
+          <Text style={[styles.primaryBtnText, { color: colors.fabText }, rtl]}>
             {t('settings.enableAllAlarmPermissions')}
           </Text>
         </Pressable>
       ) : (
         <View style={[styles.successBox, { backgroundColor: colors.surface, borderColor: colors.success }]}>
-          <Text style={[styles.successTitle, { color: colors.success }]}>✓ {t('settings.allPermissionsReady')}</Text>
-          <Text style={[styles.successHint, { color: colors.textSecondary }]}>{t('settings.lockScreenHint')}</Text>
+          <Text style={[styles.successTitle, { color: colors.success }, rtl]}>✓ {t('settings.allPermissionsReady')}</Text>
+          <Text style={[styles.successHint, { color: colors.textSecondary }, rtl]}>{t('settings.lockScreenHint')}</Text>
         </View>
       )}
     </View>
@@ -146,26 +143,27 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.sm,
     marginBottom: spacing.md,
-    alignItems: 'center',
+    width: '100%',
   },
   title: {
     ...typography.title,
-    textAlign: 'center',
+    width: '100%',
   },
   subtitle: {
     ...typography.caption,
-    textAlign: 'center',
     lineHeight: 18,
     marginBottom: spacing.xs,
+    width: '100%',
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: layoutRow(),
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
     borderRadius: radius.md,
     padding: spacing.md,
     gap: spacing.sm,
+    width: '100%',
   },
   rowText: {
     flex: 1,
@@ -181,6 +179,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: radius.md,
     alignItems: 'center',
+    width: '100%',
   },
   primaryBtnText: {
     ...typography.label,
@@ -192,14 +191,15 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
     gap: spacing.xs,
+    width: '100%',
   },
   successTitle: {
     ...typography.label,
-    textAlign: 'center',
+    width: '100%',
   },
   successHint: {
     ...typography.caption,
-    textAlign: 'center',
     lineHeight: 18,
+    width: '100%',
   },
 });

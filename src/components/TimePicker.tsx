@@ -12,6 +12,7 @@ import {
 } from '../utils/dates';
 import { spacing } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
+import { getIsRTL } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { ScrollWheel } from './ScrollWheel';
 
@@ -99,6 +100,130 @@ export function TimePicker({ value, onChange, date, onDateChange }: TimePickerPr
     onChange(toTimeValue(nextHour, nextMinute));
   };
 
+  const hourWheel =
+    timeFormat === '24h' ? (
+      <ScrollWheel
+        key="hour"
+        items={HOURS_24}
+        selectedIndex={hour}
+        onSelectIndex={(index) => updateTime(index, minute)}
+        itemHeight={ITEM_HEIGHT}
+        width={72}
+        fadeColor={colors.surfaceElevated}
+        keyExtractor={(item) => `h-${item}`}
+        renderItem={(item, { isSelected, distance }) => (
+          <Text
+            style={[
+              styles.digit,
+              {
+                color: colors.text,
+                opacity: wheelOpacity(distance, isSelected),
+                fontSize: wheelFontSize(distance, isSelected, 36),
+                fontWeight: isSelected ? '300' : '400',
+              },
+            ]}
+          >
+            {String(item).padStart(2, '0')}
+          </Text>
+        )}
+      />
+    ) : (
+      <ScrollWheel
+        key="hour"
+        items={HOURS_12}
+        selectedIndex={hour12 - 1}
+        onSelectIndex={(index) => updateTime(to24Hour(HOURS_12[index], period), minute)}
+        itemHeight={ITEM_HEIGHT}
+        width={64}
+        fadeColor={colors.surfaceElevated}
+        keyExtractor={(item) => `h12-${item}`}
+        renderItem={(item, { isSelected, distance }) => (
+          <Text
+            style={[
+              styles.digit,
+              {
+                color: colors.text,
+                opacity: wheelOpacity(distance, isSelected),
+                fontSize: wheelFontSize(distance, isSelected, 36),
+                fontWeight: isSelected ? '300' : '400',
+              },
+            ]}
+          >
+            {String(item).padStart(2, '0')}
+          </Text>
+        )}
+      />
+    );
+
+  const colon = (
+    <Text key="colon" style={[styles.colon, { color: colors.text }]}>
+      :
+    </Text>
+  );
+
+  const minuteWheel = (
+    <ScrollWheel
+      key="minute"
+      items={MINUTES}
+      selectedIndex={minute}
+      onSelectIndex={(index) => updateTime(hour, index)}
+      itemHeight={ITEM_HEIGHT}
+      width={72}
+      fadeColor={colors.surfaceElevated}
+      keyExtractor={(item) => `m-${item}`}
+      renderItem={(item, { isSelected, distance }) => (
+        <Text
+          style={[
+            styles.digit,
+            {
+              color: colors.text,
+              opacity: wheelOpacity(distance, isSelected),
+              fontSize: wheelFontSize(distance, isSelected, 36),
+              fontWeight: isSelected ? '300' : '400',
+            },
+          ]}
+        >
+          {String(item).padStart(2, '0')}
+        </Text>
+      )}
+    />
+  );
+
+  const periodWheel =
+    timeFormat === '12h' ? (
+      <ScrollWheel
+        key="period"
+        items={[...PERIODS]}
+        selectedIndex={period === 'am' ? 0 : 1}
+        onSelectIndex={(index) => updateTime(to24Hour(hour12, PERIODS[index]), minute)}
+        itemHeight={ITEM_HEIGHT}
+        width={56}
+        fadeColor={colors.surfaceElevated}
+        keyExtractor={(item) => item}
+        renderItem={(item, { isSelected, distance }) => (
+          <Text
+            style={[
+              styles.period,
+              {
+                color: colors.textSecondary,
+                opacity: wheelOpacity(distance, isSelected),
+                fontSize: wheelFontSize(distance, isSelected, 16),
+                fontWeight: isSelected ? '600' : '400',
+              },
+            ]}
+          >
+            {item}
+          </Text>
+        )}
+      />
+    ) : null;
+
+  const ltrWheels =
+    timeFormat === '12h' && periodWheel
+      ? [hourWheel, colon, minuteWheel, periodWheel]
+      : [hourWheel, colon, minuteWheel];
+  const timeWheels = getIsRTL() ? [...ltrWheels].reverse() : ltrWheels;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceElevated }]}>
       {date && onDateChange ? (
@@ -140,113 +265,7 @@ export function TimePicker({ value, onChange, date, onDateChange }: TimePickerPr
         </>
       ) : null}
 
-      <View style={styles.timeColumns}>
-        {timeFormat === '24h' ? (
-          <ScrollWheel
-            items={HOURS_24}
-            selectedIndex={hour}
-            onSelectIndex={(index) => updateTime(index, minute)}
-            itemHeight={ITEM_HEIGHT}
-            width={72}
-            fadeColor={colors.surfaceElevated}
-            keyExtractor={(item) => `h-${item}`}
-            renderItem={(item, { isSelected, distance }) => (
-              <Text
-                style={[
-                  styles.digit,
-                  {
-                    color: colors.text,
-                    opacity: wheelOpacity(distance, isSelected),
-                    fontSize: wheelFontSize(distance, isSelected, 36),
-                    fontWeight: isSelected ? '300' : '400',
-                  },
-                ]}
-              >
-                {String(item).padStart(2, '0')}
-              </Text>
-            )}
-          />
-        ) : (
-          <ScrollWheel
-            items={HOURS_12}
-            selectedIndex={hour12 - 1}
-            onSelectIndex={(index) => updateTime(to24Hour(HOURS_12[index], period), minute)}
-            itemHeight={ITEM_HEIGHT}
-            width={64}
-            fadeColor={colors.surfaceElevated}
-            keyExtractor={(item) => `h12-${item}`}
-            renderItem={(item, { isSelected, distance }) => (
-              <Text
-                style={[
-                  styles.digit,
-                  {
-                    color: colors.text,
-                    opacity: wheelOpacity(distance, isSelected),
-                    fontSize: wheelFontSize(distance, isSelected, 36),
-                    fontWeight: isSelected ? '300' : '400',
-                  },
-                ]}
-              >
-                {String(item).padStart(2, '0')}
-              </Text>
-            )}
-          />
-        )}
-
-        <Text style={[styles.colon, { color: colors.text }]}>:</Text>
-
-        <ScrollWheel
-          items={MINUTES}
-          selectedIndex={minute}
-          onSelectIndex={(index) => updateTime(hour, index)}
-          itemHeight={ITEM_HEIGHT}
-          width={72}
-          fadeColor={colors.surfaceElevated}
-          keyExtractor={(item) => `m-${item}`}
-          renderItem={(item, { isSelected, distance }) => (
-            <Text
-              style={[
-                styles.digit,
-                {
-                  color: colors.text,
-                  opacity: wheelOpacity(distance, isSelected),
-                  fontSize: wheelFontSize(distance, isSelected, 36),
-                  fontWeight: isSelected ? '300' : '400',
-                },
-              ]}
-            >
-              {String(item).padStart(2, '0')}
-            </Text>
-          )}
-        />
-
-        {timeFormat === '12h' ? (
-          <ScrollWheel
-            items={[...PERIODS]}
-            selectedIndex={period === 'am' ? 0 : 1}
-            onSelectIndex={(index) => updateTime(to24Hour(hour12, PERIODS[index]), minute)}
-            itemHeight={ITEM_HEIGHT}
-            width={56}
-            fadeColor={colors.surfaceElevated}
-            keyExtractor={(item) => item}
-            renderItem={(item, { isSelected, distance }) => (
-              <Text
-                style={[
-                  styles.period,
-                  {
-                    color: colors.textSecondary,
-                    opacity: wheelOpacity(distance, isSelected),
-                    fontSize: wheelFontSize(distance, isSelected, 16),
-                    fontWeight: isSelected ? '600' : '400',
-                  },
-                ]}
-              >
-                {item}
-              </Text>
-            )}
-          />
-        ) : null}
-      </View>
+      <View style={styles.timeColumns}>{timeWheels}</View>
     </View>
   );
 }
@@ -306,10 +325,12 @@ const styles = StyleSheet.create({
   },
   timeColumns: {
     flexDirection: 'row',
+    direction: 'ltr',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
     paddingHorizontal: spacing.sm,
+    alignSelf: 'stretch',
   },
   digit: {
     fontFamily: FONT_FAMILY,

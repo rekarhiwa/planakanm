@@ -118,12 +118,17 @@ export function getWeekDates(startDate: Date, weekStartsOn: 0 | 1 | 6 = 6): Date
   return dates;
 }
 
-export function getMonthDays(year: number, month: number): (Date | null)[][] {
+export function getMonthDays(
+  year: number,
+  month: number,
+  weekStartsOn: 0 | 1 | 6 = 6,
+): (Date | null)[][] {
   const firstDay = new Date(year, month, 1);
   const daysInMonth = getDaysInMonth(firstDay);
   const startDow = firstDay.getDay();
+  const offset = (startDow - weekStartsOn + 7) % 7;
   const weeks: (Date | null)[][] = [];
-  let currentWeek: (Date | null)[] = new Array(startDow).fill(null);
+  let currentWeek: (Date | null)[] = new Array(offset).fill(null);
 
   for (let day = 1; day <= daysInMonth; day++) {
     currentWeek.push(new Date(year, month, day));

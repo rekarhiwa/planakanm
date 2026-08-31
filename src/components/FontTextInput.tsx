@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { TextInputProps, TextStyle } from 'react-native';
 
 import { FONT_FAMILY } from '../theme/fonts';
-import { rtlText } from '../theme/rtl';
+import { getIsRTL, rtlTextStyle } from '../theme/rtl';
 
 interface FontTextInputProps extends TextInputProps {
   placeholder: string;
@@ -19,21 +19,29 @@ export const FontTextInput = forwardRef<TextInput, FontTextInputProps>(function 
     inputStyle,
     value,
     multiline,
+    textAlign: textAlignProp,
     ...props
   },
   ref,
 ) {
-  const mergedStyle = StyleSheet.flatten([style, inputStyle, { fontFamily: FONT_FAMILY }, rtlText]);
+  const rtl = rtlTextStyle();
+  const textAlign = textAlignProp ?? (getIsRTL() ? 'right' : 'left');
+  const mergedStyle = StyleSheet.flatten([
+    style,
+    inputStyle,
+    { fontFamily: FONT_FAMILY, textAlign },
+    rtl,
+  ]);
   const hasValue = Boolean(value && String(value).length > 0);
 
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, getIsRTL() ? styles.wrapRtl : null]}>
       {!hasValue ? (
         <Text
           style={[
             mergedStyle,
             styles.placeholder,
-            { color: placeholderColor },
+            { color: placeholderColor, textAlign },
             multiline ? styles.placeholderMultiline : null,
           ]}
           pointerEvents="none"
@@ -48,7 +56,8 @@ export const FontTextInput = forwardRef<TextInput, FontTextInputProps>(function 
         value={value}
         multiline={multiline}
         placeholder=""
-        style={[mergedStyle, styles.input]}
+        textAlign={textAlign}
+        style={[mergedStyle, styles.input, Platform.OS === 'android' ? styles.androidInput : null]}
       />
     </View>
   );
@@ -57,10 +66,18 @@ export const FontTextInput = forwardRef<TextInput, FontTextInputProps>(function 
 const styles = StyleSheet.create({
   wrap: {
     position: 'relative',
+    width: '100%',
+  },
+  wrapRtl: {
+    direction: 'rtl',
   },
   input: {
     padding: 0,
     margin: 0,
+    width: '100%',
+  },
+  androidInput: {
+    includeFontPadding: false,
   },
   placeholder: {
     position: 'absolute',
@@ -73,3 +90,4 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
 });
+

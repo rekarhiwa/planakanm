@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Application from 'expo-application';
-import { AppState, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { AppState, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AlarmPermissionsCard } from '../components/AlarmPermissionsCard';
 import { CategoryManager } from '../components/CategoryManager';
 import { Chip } from '../components/Chip';
+import { FontTextInput } from '../components/FontTextInput';
 import { exportPlans, importPlans } from '../data/exportImport';
 import type { SettingsStackParamList } from '../navigation';
 import { getPermissionStatus, type PermissionStatus } from '../permissions';
@@ -17,8 +18,7 @@ import { useSettingsStore } from '../stores/settingsStore';
 import { useTheme } from '../theme/ThemeContext';
 import type { ThemeMode } from '../theme/colors';
 import { radius, spacing, typography } from '../theme/colors';
-import { FONT_FAMILY } from '../theme/fonts';
-import { rtlText } from '../theme/rtl';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import type { AppLanguage } from '../i18n';
 
 export function SettingsScreen() {
@@ -36,6 +36,7 @@ export function SettingsScreen() {
     isSamsung: false,
   });
   const [profileName, setProfileName] = useState(settings.userName ?? '');
+  const rtl = rtlTextStyle();
 
   const refreshPermissions = useCallback(async () => {
     setPermissionStatus(await getPermissionStatus());
@@ -102,19 +103,19 @@ export function SettingsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={[styles.title, { color: colors.text }]}>{t('settings.title')}</Text>
+        <Text style={[styles.title, { color: colors.text }, rtl]}>{t('settings.title')}</Text>
 
         <AlarmPermissionsCard status={permissionStatus} onRefresh={refreshPermissions} />
 
-        <SettingSection title={t('settings.profile')} colors={colors}>
-          <TextInput
+        <SettingSection title={t('settings.profile')} colors={colors} rtl={rtl}>
+          <FontTextInput
             value={profileName}
             onChangeText={setProfileName}
             onBlur={() => {
               void saveProfileName();
             }}
             placeholder={t('onboarding.namePlaceholder')}
-            placeholderTextColor={colors.textSecondary}
+            placeholderColor={colors.textSecondary}
             style={[
               styles.profileInput,
               {
@@ -126,11 +127,11 @@ export function SettingsScreen() {
           />
         </SettingSection>
 
-        <SettingSection title={t('categories.title')} colors={colors}>
+        <SettingSection title={t('categories.title')} colors={colors} rtl={rtl}>
           <CategoryManager />
         </SettingSection>
 
-        <SettingSection title={t('settings.language')} colors={colors}>
+        <SettingSection title={t('settings.language')} colors={colors} rtl={rtl}>
           <View style={styles.chipRow}>
             {(['ku', 'ar', 'en'] as AppLanguage[]).map((lang) => (
               <Chip
@@ -143,7 +144,7 @@ export function SettingsScreen() {
           </View>
         </SettingSection>
 
-        <SettingSection title={t('settings.theme')} colors={colors}>
+        <SettingSection title={t('settings.theme')} colors={colors} rtl={rtl}>
           <View style={styles.chipRow}>
             {(['light', 'dark', 'system'] as ThemeMode[]).map((m) => (
               <Chip
@@ -156,30 +157,12 @@ export function SettingsScreen() {
           </View>
         </SettingSection>
 
-        <SettingSection title={t('settings.defaultReminder')} colors={colors}>
-          <View style={styles.chipRow}>
-            <Chip
-              label={t('create.notification')}
-              selected={settings.defaultReminderType === 'notification'}
-              onPress={() => updateSettings({ defaultReminderType: 'notification' })}
-            />
-            <Chip
-              label={t('create.fullscreenAlarm')}
-              selected={settings.defaultReminderType === 'alarm'}
-              onPress={() => updateSettings({ defaultReminderType: 'alarm' })}
-            />
-          </View>
-          <Text style={[styles.hint, { color: colors.textSecondary }]}>
-            {t('settings.defaultReminderHint')}
-          </Text>
-        </SettingSection>
-
-        <SettingSection title={t('settings.defaultSnooze')} colors={colors}>
+        <SettingSection title={t('settings.defaultSnooze')} colors={colors} rtl={rtl}>
           <View style={styles.chipRow}>
             {[5, 10, 15, 30].map((min) => (
               <Chip
                 key={min}
-                label={`${min} min`}
+                label={t('settings.snoozeMinutes', { count: min })}
                 selected={settings.defaultSnoozeMinutes === min}
                 onPress={() => updateSettings({ defaultSnoozeMinutes: min })}
               />
@@ -187,30 +170,30 @@ export function SettingsScreen() {
           </View>
         </SettingSection>
 
-        <SettingSection title="" colors={colors}>
+        <SettingSection title="" colors={colors} rtl={rtl}>
           <Pressable
             onPress={handleExport}
             style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}
           >
-            <Text style={{ color: colors.text, ...typography.label }}>{t('settings.export')}</Text>
+            <Text style={[{ color: colors.text, ...typography.label }, rtl]}>{t('settings.export')}</Text>
           </Pressable>
           <Pressable
             onPress={handleImport}
             style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, marginTop: spacing.sm }]}
           >
-            <Text style={{ color: colors.text, ...typography.label }}>{t('settings.import')}</Text>
+            <Text style={[{ color: colors.text, ...typography.label }, rtl]}>{t('settings.import')}</Text>
           </Pressable>
         </SettingSection>
 
-        <SettingSection title="" colors={colors}>
+        <SettingSection title="" colors={colors} rtl={rtl}>
           <Pressable
             onPress={() => navigation.navigate('About')}
             style={[styles.aboutRow, { backgroundColor: colors.surface, borderColor: colors.border }]}
           >
             <View style={styles.aboutText}>
-              <Text style={[styles.aboutTitle, { color: colors.text }]}>{t('about.title')}</Text>
-              <Text style={[styles.aboutSubtitle, { color: colors.textSecondary }]}>
-                {t('about.openHint')} · {t('about.versionLabel', {
+              <Text style={[styles.aboutTitle, { color: colors.text }, rtl]}>{t('about.title')}</Text>
+              <Text style={[styles.aboutSubtitle, { color: colors.textSecondary }, rtl]}>
+                {t('about.versionLabel', {
                   version: Application.nativeApplicationVersion ?? '1.0.0',
                 })}
               </Text>
@@ -227,15 +210,17 @@ function SettingSection({
   title,
   children,
   colors,
+  rtl,
 }: {
   title: string;
   children: React.ReactNode;
   colors: { text: string; textSecondary?: string };
+  rtl: ReturnType<typeof rtlTextStyle>;
 }) {
   return (
-    <View style={styles.section}>
-      {title ? <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text> : null}
-      {children}
+    <View style={[styles.section, { alignItems: layoutAlignEnd() }]}>
+      {title ? <Text style={[styles.sectionTitle, { color: colors.text }, rtl]}>{title}</Text> : null}
+      <View style={styles.sectionBody}>{children}</View>
     </View>
   );
 }
@@ -243,28 +228,34 @@ function SettingSection({
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { padding: spacing.lg, paddingBottom: 100 },
-  title: { ...typography.display, fontSize: 26, textAlign: 'right', marginBottom: spacing.lg },
-  section: { marginBottom: spacing.xl },
-  sectionTitle: { ...typography.label, textAlign: 'right', marginBottom: spacing.md },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'flex-end' },
-  hint: { ...typography.caption, textAlign: 'right', marginTop: spacing.sm, lineHeight: 18 },
-  button: { padding: spacing.lg, borderRadius: radius.md, alignItems: 'center' },
+  title: { ...typography.display, fontSize: 26, marginBottom: spacing.lg },
+  section: { marginBottom: spacing.xl, width: '100%' },
+  sectionBody: { width: '100%' },
+  sectionTitle: { ...typography.label, marginBottom: spacing.md, width: '100%' },
+  chipRow: {
+    flexDirection: layoutRow(),
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    justifyContent: 'flex-start',
+    width: '100%',
+  },
+  button: { padding: spacing.lg, borderRadius: radius.md, alignItems: 'center', width: '100%' },
   profileInput: {
-    fontFamily: FONT_FAMILY,
     borderWidth: 1,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 16,
-    ...rtlText,
+    width: '100%',
   },
   aboutRow: {
-    flexDirection: 'row',
+    flexDirection: layoutRow(),
     alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.lg,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     gap: spacing.md,
+    width: '100%',
   },
   aboutText: {
     flex: 1,
@@ -273,11 +264,9 @@ const styles = StyleSheet.create({
   aboutTitle: {
     ...typography.label,
     fontSize: 16,
-    textAlign: 'right',
   },
   aboutSubtitle: {
     ...typography.caption,
-    textAlign: 'right',
     lineHeight: 18,
   },
   aboutChevron: {

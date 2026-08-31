@@ -199,10 +199,6 @@ export async function requestAllAlarmPermissions(): Promise<void> {
     await requestPermission('exactAlarm');
   }
 
-  if (Platform.OS === 'android' && Number(Platform.Version) >= 34) {
-    await requestPermission('fullScreen');
-  }
-
   if (isSamsungDevice()) {
     await requestPermission('battery');
   }
