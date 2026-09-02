@@ -96,7 +96,7 @@ export function AlarmPermissionsCard({ status, onRefresh }: AlarmPermissionsCard
       {rows.map((row) => (
         <View
           key={row.key}
-          style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border, flexDirection: layoutRow() }]}
         >
           <View style={styles.rowText}>
             <Text style={[{ color: colors.text, ...typography.label }, rtl]}>{row.label}</Text>
@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   row: {
-    flexDirection: layoutRow(),
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,

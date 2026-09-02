@@ -9,6 +9,7 @@ import { getDefaultTimeValue, TimePicker } from './TimePicker';
 import { ScrollWheel } from './ScrollWheel';
 import { radius, spacing, typography } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { formatTime24, getTodayISO } from '../utils/dates';
 
@@ -34,6 +35,7 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
   const [minuteIndex, setMinuteIndex] = useState(29);
   const [date, setDate] = useState(getTodayISO());
   const [time, setTime] = useState(getDefaultTimeValue());
+  const rtl = rtlTextStyle();
 
   const renderBackdrop = useCallback(
     (props: React.ComponentProps<typeof BottomSheetBackdrop>) => (
@@ -72,16 +74,16 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
         nestedScrollEnabled
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.title, { color: colors.text }]}>
+        <Text style={[styles.title, { color: colors.text }, rtl]}>
           {isOverdue ? t('snooze.overdueTitle') : t('snooze.title')}
         </Text>
         {isOverdue && (
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }, rtl]}>
             {t('snooze.missedQuestion')}
           </Text>
         )}
 
-        <View style={styles.grid}>
+        <View style={[styles.grid, { flexDirection: layoutRow() }]}>
           {PRESET_ITEMS.map((preset) => (
             <Pressable
               key={preset.key}
@@ -91,18 +93,18 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
               }}
               style={[styles.option, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}
             >
-              <Text style={[styles.optionText, { color: colors.text }]}>
+              <Text style={[styles.optionText, { color: colors.text }, rtl]}>
                 {t(preset.labelKey)}
               </Text>
             </Pressable>
           ))}
         </View>
 
-        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }, rtl]}>
           {t('snooze.customSection')}
         </Text>
 
-        <View style={styles.modeRow}>
+        <View style={[styles.modeRow, { flexDirection: layoutRow() }]}>
           <Pressable
             onPress={() => setCustomMode('minutes')}
             style={[
@@ -198,7 +200,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   grid: {
-    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
     justifyContent: 'center',
@@ -220,7 +221,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   modeRow: {
-    flexDirection: 'row',
     gap: spacing.sm,
     marginBottom: spacing.md,
   },

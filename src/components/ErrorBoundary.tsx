@@ -35,7 +35,12 @@ export class ErrorBoundary extends Component<Props, State> {
           <Text style={{ color: '#EF5350', fontSize: 18, marginBottom: 12, textAlign: 'center' }}>
             هەڵەیەک ڕوویدا
           </Text>
-          <Text style={{ color: '#F5F0E6', textAlign: 'center' }}>{this.state.error.message}</Text>
+          <Text style={{ color: '#F5F0E6', textAlign: 'center', marginBottom: 8 }}>
+            {this.state.error.message}
+          </Text>
+          <Text style={{ color: '#A89878', textAlign: 'center', fontSize: 12 }} selectable>
+            {this.state.error.name}
+          </Text>
         </View>
       );
     }

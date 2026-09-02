@@ -116,7 +116,7 @@ export function CreatePlanScreen() {
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={styles.headerBtn}>
           <Text style={[styles.headerAction, { color: colors.primary }]}>{t('notes.back')}</Text>
         </Pressable>
-        <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.headerTitle, { color: colors.text }, rtl]} numberOfLines={1}>
           {t('create.title')}
         </Text>
         <Pressable
@@ -180,15 +180,15 @@ export function CreatePlanScreen() {
             />
           </View>
 
-          <View style={styles.block}>
-            <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.pickDate')}</Text>
+          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+            <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.pickDate')}</Text>
             <View style={styles.dateSelectorWrap}>
               <DateSelector selectedDate={date} onSelectDate={setDate} />
             </View>
           </View>
 
-          <View style={styles.block}>
-            <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.setTime')}</Text>
+          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+            <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.setTime')}</Text>
             {timePreview ? (
               <Text style={[styles.timePreview, { color: colors.text }]}>{timePreview}</Text>
             ) : null}
@@ -198,8 +198,8 @@ export function CreatePlanScreen() {
           <View style={[styles.block, styles.optionsBlock, { borderTopColor: colors.border }]}>
             {categories.length > 0 ? (
               <View style={styles.optionSection}>
-                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.category')}</Text>
-                <View style={styles.chipRow}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.category')}</Text>
+                <View style={[styles.chipRow, { flexDirection: layoutRow() }]}>
                   <Chip
                     label={t('categories.none')}
                     selected={!categoryId}
@@ -219,8 +219,8 @@ export function CreatePlanScreen() {
             ) : null}
 
             <View style={styles.optionSection}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.repeat')}</Text>
-              <View style={styles.chipRow}>
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.repeat')}</Text>
+              <View style={[styles.chipRow, { flexDirection: layoutRow() }]}>
                 {(['none', 'daily', 'weekly', 'monthly', 'yearly'] as RepeatType[]).map((r) => (
                   <Chip
                     key={r}
@@ -234,7 +234,7 @@ export function CreatePlanScreen() {
 
             <View style={styles.optionSection}>
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.priority')}</Text>
-              <View style={styles.chipRow}>
+              <View style={[styles.chipRow, { flexDirection: layoutRow() }]}>
                 {(['low', 'normal', 'high', 'urgent'] as PlanPriority[]).map((p) => (
                   <Chip
                     key={p}
@@ -252,7 +252,7 @@ export function CreatePlanScreen() {
             style={[styles.submit, { backgroundColor: colors.primary, opacity: title.trim() ? 1 : 0.5 }]}
             disabled={!title.trim()}
           >
-            <Text style={[styles.submitText, { color: colors.fabText }]}>{t('create.addPlan')}</Text>
+            <Text style={[styles.submitText, { color: colors.fabText }, rtl]}>{t('create.addPlan')}</Text>
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -347,15 +347,10 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   chipRow: {
-    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-    justifyContent: 'flex-end',
-  },
-  reminderHint: {
-    ...typography.caption,
-    lineHeight: 18,
-    textAlign: 'right',
+    justifyContent: 'flex-start',
+    width: '100%',
   },
   submit: {
     padding: spacing.lg,

@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { FontTextInput } from '../components/FontTextInput';
 import { requestAppPermissions } from '../permissions';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { radius, spacing, typography } from '../theme/colors';
-import { FONT_FAMILY } from '../theme/fonts';
-import { rtlText } from '../theme/rtl';
+import { rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 const FEATURE_STEPS = [
@@ -25,6 +24,7 @@ export function OnboardingScreen() {
   const setShowOnboarding = useUIStore((s) => s.setShowOnboarding);
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
+  const rtl = rtlTextStyle();
 
   const totalSteps = onboardingComplete ? 1 : FEATURE_STEPS.length + 1;
   const isProfileStep = step === 0;
@@ -59,13 +59,13 @@ export function OnboardingScreen() {
         {isProfileStep ? (
           <>
             <Text style={styles.icon}>👋</Text>
-            <Text style={[styles.title, { color: colors.text }]}>{t('onboarding.profileTitle')}</Text>
-            <Text style={[styles.desc, { color: colors.textSecondary }]}>{t('onboarding.profileDesc')}</Text>
-            <TextInput
+            <Text style={[styles.title, { color: colors.text }, rtl]}>{t('onboarding.profileTitle')}</Text>
+            <Text style={[styles.desc, { color: colors.textSecondary }, rtl]}>{t('onboarding.profileDesc')}</Text>
+            <FontTextInput
               value={name}
               onChangeText={setName}
               placeholder={t('onboarding.namePlaceholder')}
-              placeholderTextColor={colors.textSecondary}
+              placeholderColor={colors.textSecondary}
               autoFocus
               style={[
                 styles.nameInput,
@@ -80,10 +80,10 @@ export function OnboardingScreen() {
         ) : (
           <>
             <Text style={styles.icon}>{FEATURE_STEPS[featureIndex].icon}</Text>
-            <Text style={[styles.title, { color: colors.text }]}>
+            <Text style={[styles.title, { color: colors.text }, rtl]}>
               {t(FEATURE_STEPS[featureIndex].titleKey)}
             </Text>
-            <Text style={[styles.desc, { color: colors.textSecondary }]}>
+            <Text style={[styles.desc, { color: colors.textSecondary }, rtl]}>
               {t(FEATURE_STEPS[featureIndex].descKey)}
             </Text>
           </>
@@ -134,14 +134,12 @@ const styles = StyleSheet.create({
   title: { ...typography.display, fontSize: 28, textAlign: 'center', marginBottom: spacing.lg },
   desc: { ...typography.body, textAlign: 'center', lineHeight: 24, paddingHorizontal: spacing.lg },
   nameInput: {
-    fontFamily: FONT_FAMILY,
     width: '100%',
     marginTop: spacing.xl,
     borderWidth: 1,
     borderRadius: radius.md,
     padding: spacing.lg,
     fontSize: 18,
-    ...rtlText,
   },
   dots: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xxl },
   dot: { width: 8, height: 8, borderRadius: 4 },

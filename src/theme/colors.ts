@@ -84,14 +84,13 @@ export const radius = {
 } as const;
 
 import { FONT_FAMILY } from './fonts';
-import { rtlText } from './rtl';
 
 export const typography = {
-  display: { fontFamily: FONT_FAMILY, fontSize: 32, ...rtlText },
-  title: { fontFamily: FONT_FAMILY, fontSize: 20, ...rtlText },
-  body: { fontFamily: FONT_FAMILY, fontSize: 16, ...rtlText },
-  caption: { fontFamily: FONT_FAMILY, fontSize: 13, ...rtlText },
-  label: { fontFamily: FONT_FAMILY, fontSize: 15, ...rtlText },
+  display: { fontFamily: FONT_FAMILY, fontSize: 32 },
+  title: { fontFamily: FONT_FAMILY, fontSize: 20 },
+  body: { fontFamily: FONT_FAMILY, fontSize: 16 },
+  caption: { fontFamily: FONT_FAMILY, fontSize: 13 },
+  label: { fontFamily: FONT_FAMILY, fontSize: 15 },
 };
 
 export const motion = {

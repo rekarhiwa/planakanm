@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { radius, spacing, typography } from '../theme/colors';
+import { layoutRow } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface ChipProps {
@@ -25,7 +26,7 @@ export function Chip({ label, selected, onPress, color }: ChipProps) {
         },
       ]}
     >
-      <View style={styles.content}>
+      <View style={[styles.content, { flexDirection: layoutRow() }]}>
         {color && !selected && <View style={[styles.dot, { backgroundColor: color }]} />}
         <Text
           style={[
@@ -48,7 +49,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   content: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
   },

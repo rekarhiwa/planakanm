@@ -35,7 +35,7 @@ export const FontTextInput = forwardRef<TextInput, FontTextInputProps>(function 
   const hasValue = Boolean(value && String(value).length > 0);
 
   return (
-    <View style={[styles.wrap, getIsRTL() ? styles.wrapRtl : null]}>
+    <View style={styles.wrap}>
       {!hasValue ? (
         <Text
           style={[
@@ -67,9 +67,6 @@ const styles = StyleSheet.create({
   wrap: {
     position: 'relative',
     width: '100%',
-  },
-  wrapRtl: {
-    direction: 'rtl',
   },
   input: {
     padding: 0,

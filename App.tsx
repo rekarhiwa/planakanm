@@ -13,7 +13,6 @@ import { AppNavigation } from './src/navigation';
 import { ConfirmDialog } from './src/components/ConfirmDialog';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { initDatabase } from './src/data/db/client';
-import { initI18n } from './src/i18n';
 import { navigateToPlanDetail } from './src/navigation/navigationRef';
 import { requestAppPermissions } from './src/permissions';
 import {
@@ -92,7 +91,6 @@ export default function App() {
     async function bootstrap() {
       try {
         await initDatabase();
-        await initI18n('ku');
         await useSettingsStore.getState().loadSettings();
         await usePlanStore.getState().refreshAll();
       } catch (error) {

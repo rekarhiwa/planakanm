@@ -25,7 +25,7 @@ import { useDialogStore } from '../stores/dialogStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { spacing, typography } from '../theme/colors';
-import { alignItemsEnd } from '../theme/rtl';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import type { SnoozeSelection } from '../domain/services/snoozeEngine';
 import { getGreetingKey, groupPlansByTime, isPlanNow } from '../utils/dates';
@@ -130,6 +130,7 @@ export function HomeScreen() {
   );
 
   const overduePlan = overdueList[0] ?? (overduePlans.length > 0 ? plans.find((p) => p.id === overduePlans[0]) : undefined);
+  const rtl = rtlTextStyle();
 
   const getPlanRowProps = (plan: Plan) => ({
     plan,
@@ -146,10 +147,10 @@ export function HomeScreen() {
         }
       >
         <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <View style={styles.headerText}>
-              <Text style={[styles.greeting, { color: colors.text }]}>{greeting}</Text>
-              <Text style={[styles.remaining, { color: colors.textSecondary }]}>
+          <View style={[styles.headerTop, { flexDirection: layoutRow() }]}>
+            <View style={[styles.headerText, { alignItems: layoutAlignEnd() }]}>
+              <Text style={[styles.greeting, { color: colors.text }, rtl]}>{greeting}</Text>
+              <Text style={[styles.remaining, { color: colors.textSecondary }, rtl]}>
                 {t('home.remaining', { count: pendingCount })}
               </Text>
             </View>
@@ -195,7 +196,7 @@ export function HomeScreen() {
 
             {groups.morning.length > 0 && (
               <>
-                <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>
+                <Text style={[styles.groupLabel, { color: colors.textSecondary }, rtl]}>
                   {t('home.morning')}
                 </Text>
                 {groups.morning.map((plan) => (
@@ -213,7 +214,7 @@ export function HomeScreen() {
 
             {groups.afternoon.length > 0 && (
               <>
-                <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>
+                <Text style={[styles.groupLabel, { color: colors.textSecondary }, rtl]}>
                   {t('home.afternoon')}
                 </Text>
                 {groups.afternoon.map((plan) => (
@@ -231,7 +232,7 @@ export function HomeScreen() {
 
             {groups.noTime.length > 0 && (
               <>
-                <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>
+                <Text style={[styles.groupLabel, { color: colors.textSecondary }, rtl]}>
                   {t('home.noTime')}
                 </Text>
                 {groups.noTime.map((plan) => (
@@ -306,12 +307,11 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   headerTop: {
-    flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: spacing.md,
   },
-  headerText: { flex: 1, alignItems: alignItemsEnd },
+  headerText: { flex: 1 },
   searchBtn: {
     paddingTop: 4,
   },

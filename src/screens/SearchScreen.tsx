@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FontTextInput } from '../components/FontTextInput';
 import { PlanRow } from '../components/PlanRow';
 import type { Plan } from '../domain/entities/types';
 import * as planRepo from '../data/repositories/planRepository';
 import { spacing, typography } from '../theme/colors';
+import { rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 export function SearchScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const rtl = rtlTextStyle();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Plan[]>([]);
 
@@ -31,13 +34,13 @@ export function SearchScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TextInput
+      <FontTextInput
         style={[
           styles.input,
           { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
         ]}
         placeholder={t('search.placeholder')}
-        placeholderTextColor={colors.textSecondary}
+        placeholderColor={colors.textSecondary}
         value={query}
         onChangeText={setQuery}
         autoFocus
@@ -49,7 +52,7 @@ export function SearchScreen() {
         ListEmptyComponent={
           query ? (
             <View style={styles.empty}>
-              <Text style={{ color: colors.textSecondary, textAlign: 'center' }}>
+              <Text style={[{ color: colors.textSecondary, textAlign: 'center' }, rtl]}>
                 {t('search.noResults')}
               </Text>
             </View>
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: spacing.lg,
     ...typography.body,
-    textAlign: 'right',
+    width: 'auto',
   },
   list: { paddingHorizontal: spacing.lg, paddingBottom: 100 },
   empty: { padding: spacing.xxl },

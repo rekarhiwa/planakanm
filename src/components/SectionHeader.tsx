@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { spacing, typography } from '../theme/colors';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface SectionHeaderProps {
@@ -10,12 +11,13 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, count }: SectionHeaderProps) {
   const { colors } = useTheme();
+  const rtl = rtlTextStyle();
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+    <View style={[styles.container, { flexDirection: layoutRow() }]}>
+      <Text style={[styles.title, { color: colors.text }, rtl]}>{title}</Text>
       {count !== undefined && count > 0 && (
-        <Text style={[styles.count, { color: colors.textSecondary }]}>{count}</Text>
+        <Text style={[styles.count, { color: colors.textSecondary }, rtl]}>{count}</Text>
       )}
     </View>
   );
@@ -23,7 +25,6 @@ export function SectionHeader({ title, count }: SectionHeaderProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: spacing.sm,

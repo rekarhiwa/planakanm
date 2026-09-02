@@ -4,7 +4,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { AlarmIcon } from './AlarmIcon';
 import type { Note } from '../domain/entities/types';
 import { radius, spacing, typography } from '../theme/colors';
-import { layoutRow } from '../theme/rtl';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface NoteRowProps {
@@ -16,6 +16,7 @@ interface NoteRowProps {
 
 export function NoteRow({ note, onPress, onToggleComplete, onDelete }: NoteRowProps) {
   const { colors } = useTheme();
+  const rtl = rtlTextStyle();
 
   const renderLeftActions = () => (
     <View style={styles.actions}>
@@ -54,7 +55,7 @@ export function NoteRow({ note, onPress, onToggleComplete, onDelete }: NoteRowPr
           {note.completed ? <Text style={styles.checkMark}>✓</Text> : null}
         </Pressable>
 
-        <Pressable onPress={onPress} style={styles.content}>
+        <Pressable onPress={onPress} style={[styles.content, { alignItems: layoutAlignEnd() }]}>
           <View style={[styles.titleRow, { flexDirection: layoutRow() }]}>
             {note.hasAlarm ? (
               <AlarmIcon color={colors.primary} size={14} />
@@ -62,6 +63,7 @@ export function NoteRow({ note, onPress, onToggleComplete, onDelete }: NoteRowPr
             <Text
               style={[
                 styles.title,
+                rtl,
                 {
                   color: note.completed ? colors.textSecondary : colors.text,
                   textDecorationLine: note.completed ? 'line-through' : 'none',
@@ -90,7 +92,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    alignItems: 'flex-end',
   },
   titleRow: {
     alignItems: 'center',
@@ -99,7 +100,6 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.body,
-    textAlign: 'right',
     flexShrink: 1,
   },
   checkButton: {
@@ -116,7 +116,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   actions: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.sm,

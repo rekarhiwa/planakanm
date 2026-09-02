@@ -1,7 +1,15 @@
-import { I18nManager, type TextStyle, type ViewStyle } from 'react-native';
+import type { TextStyle, ViewStyle } from 'react-native';
+
+import { isRtlLanguage, type AppLanguage } from '../i18n/languages';
+
+let layoutLanguage: AppLanguage = 'ku';
+
+export function setLayoutLanguage(language: AppLanguage) {
+  layoutLanguage = language;
+}
 
 export function getIsRTL(): boolean {
-  return I18nManager.isRTL;
+  return isRtlLanguage(layoutLanguage);
 }
 
 export function rtlTextStyle(): TextStyle {
@@ -15,13 +23,11 @@ export function rtlTextStyle(): TextStyle {
 /** @deprecated Use rtlTextStyle() for runtime-correct direction. */
 export const rtlText: TextStyle = rtlTextStyle();
 
-export const textAlignStart: TextStyle['textAlign'] = getIsRTL() ? 'right' : 'left';
-export const textAlignEnd: TextStyle['textAlign'] = getIsRTL() ? 'left' : 'right';
-export const writingDirection: TextStyle['writingDirection'] = getIsRTL() ? 'rtl' : 'ltr';
-export const rowDirection: ViewStyle['flexDirection'] = getIsRTL() ? 'row-reverse' : 'row';
-export const alignItemsStart: ViewStyle['alignItems'] = getIsRTL() ? 'flex-end' : 'flex-start';
-export const alignItemsEnd: ViewStyle['alignItems'] = getIsRTL() ? 'flex-start' : 'flex-end';
-
+/**
+ * Row direction for manual RTL layouts.
+ * React Native does NOT auto-flip flexDirection when forceRTL is on,
+ * so RTL languages need row-reverse to put the first child on the right.
+ */
 export function layoutRow(): ViewStyle['flexDirection'] {
   return getIsRTL() ? 'row-reverse' : 'row';
 }

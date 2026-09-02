@@ -73,7 +73,7 @@ export function CategoryManager() {
         ]}
       />
 
-      <View style={styles.colorRow}>
+      <View style={[styles.colorRow, { flexDirection: layoutRow() }]}>
         {CATEGORY_COLORS.map((color) => (
           <Pressable
             key={color}
@@ -101,9 +101,9 @@ export function CategoryManager() {
           {categories.map((category) => (
             <View
               key={category.id}
-              style={[styles.item, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              style={[styles.item, { backgroundColor: colors.surface, borderColor: colors.border, flexDirection: layoutRow() }]}
             >
-              <View style={styles.itemLeft}>
+              <View style={[styles.itemLeft, { flexDirection: layoutRow() }]}>
                 <View style={[styles.itemDot, { backgroundColor: category.color }]} />
                 <Text style={[{ color: colors.text, ...typography.label }, rtl]}>{category.name}</Text>
               </View>
@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   colorRow: {
-    flexDirection: layoutRow(),
     flexWrap: 'wrap',
     gap: spacing.sm,
     justifyContent: 'flex-start',
@@ -153,7 +152,6 @@ const styles = StyleSheet.create({
   },
   list: { gap: spacing.sm, marginTop: spacing.sm, width: '100%' },
   item: {
-    flexDirection: layoutRow(),
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
@@ -162,7 +160,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   itemLeft: {
-    flexDirection: layoutRow(),
     alignItems: 'center',
     gap: spacing.sm,
     flex: 1,

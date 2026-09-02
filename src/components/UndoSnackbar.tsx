@@ -4,6 +4,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { spacing, typography } from '../theme/colors';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface UndoSnackbarProps {
@@ -16,6 +17,7 @@ interface UndoSnackbarProps {
 export function UndoSnackbar({ visible, message, onUndo, onDismiss }: UndoSnackbarProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const rtl = rtlTextStyle();
 
   useEffect(() => {
     if (visible) {
@@ -30,11 +32,11 @@ export function UndoSnackbar({ visible, message, onUndo, onDismiss }: UndoSnackb
     <Animated.View
       entering={FadeIn.duration(200)}
       exiting={FadeOut.duration(200)}
-      style={[styles.container, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}
+      style={[styles.container, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, flexDirection: layoutRow() }]}
     >
-      <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
+      <Text style={[styles.message, { color: colors.text }, rtl]}>{message}</Text>
       <Pressable onPress={onUndo}>
-        <Text style={[styles.undo, { color: colors.primary }]}>{t('common.undo')}</Text>
+        <Text style={[styles.undo, { color: colors.primary }, rtl]}>{t('common.undo')}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -46,7 +48,6 @@ const styles = StyleSheet.create({
     bottom: 100,
     left: spacing.lg,
     right: spacing.lg,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: spacing.lg,
@@ -57,10 +58,9 @@ const styles = StyleSheet.create({
   message: {
     ...typography.body,
     flex: 1,
-    textAlign: 'right',
   },
   undo: {
     ...typography.label,
-    marginLeft: spacing.lg,
+    marginStart: spacing.lg,
   },
 });

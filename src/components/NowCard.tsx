@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { Plan } from '../domain/entities/types';
 import { radius, spacing, typography } from '../theme/colors';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { getPlanRemainingParts } from '../utils/dates';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -44,23 +45,24 @@ export function NowCard({ plan, onComplete, onSnooze }: NowCardProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const remainingLabel = useRemainingLabel(plan);
+  const rtl = rtlTextStyle();
 
   return (
     <View style={[styles.card, { backgroundColor: colors.nowHighlight, borderColor: colors.primary }]}>
-      <View style={styles.main}>
-        <View style={styles.textBlock}>
-          <Text style={[styles.badge, { color: colors.primary }]}>{t('home.now')}</Text>
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+      <View style={[styles.main, { flexDirection: layoutRow() }]}>
+        <View style={[styles.textBlock, { alignItems: layoutAlignEnd() }]}>
+          <Text style={[styles.badge, { color: colors.primary }, rtl]}>{t('home.now')}</Text>
+          <Text style={[styles.title, { color: colors.text }, rtl]} numberOfLines={1}>
             {plan.title}
           </Text>
           {remainingLabel ? (
-            <Text style={[styles.remaining, { color: colors.textSecondary }]} numberOfLines={1}>
+            <Text style={[styles.remaining, { color: colors.textSecondary }, rtl]} numberOfLines={1}>
               {remainingLabel}
             </Text>
           ) : null}
         </View>
 
-        <View style={styles.actions}>
+        <View style={[styles.actions, { flexDirection: layoutRow() }]}>
           <Pressable
             onPress={onComplete}
             hitSlop={8}
@@ -91,13 +93,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   main: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
   textBlock: {
     flex: 1,
-    alignItems: 'flex-end',
     gap: 2,
   },
   badge: {
@@ -107,14 +107,11 @@ const styles = StyleSheet.create({
   title: {
     ...typography.label,
     fontSize: 15,
-    textAlign: 'right',
   },
   remaining: {
     ...typography.caption,
-    textAlign: 'right',
   },
   actions: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
   },

@@ -12,7 +12,6 @@ import {
 } from '../utils/dates';
 import { spacing } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
-import { getIsRTL } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { ScrollWheel } from './ScrollWheel';
 
@@ -222,7 +221,7 @@ export function TimePicker({ value, onChange, date, onDateChange }: TimePickerPr
     timeFormat === '12h' && periodWheel
       ? [hourWheel, colon, minuteWheel, periodWheel]
       : [hourWheel, colon, minuteWheel];
-  const timeWheels = getIsRTL() ? [...ltrWheels].reverse() : ltrWheels;
+  const timeWheels = ltrWheels;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceElevated }]}>
@@ -325,7 +324,6 @@ const styles = StyleSheet.create({
   },
   timeColumns: {
     flexDirection: 'row',
-    direction: 'ltr',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,

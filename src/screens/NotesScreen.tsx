@@ -13,7 +13,7 @@ import { useDialogStore } from '../stores/dialogStore';
 import { useNoteStore } from '../stores/noteStore';
 import { useUIStore } from '../stores/uiStore';
 import { spacing, typography } from '../theme/colors';
-import { alignItemsEnd } from '../theme/rtl';
+import { layoutAlignEnd, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 export function NotesScreen() {
@@ -26,6 +26,7 @@ export function NotesScreen() {
   const toggleNoteCompleted = useNoteStore((s) => s.toggleNoteCompleted);
   const deleteNote = useNoteStore((s) => s.deleteNote);
   const showUndo = useUIStore((s) => s.showUndo);
+  const rtl = rtlTextStyle();
 
   useFocusEffect(
     useCallback(() => {
@@ -59,9 +60,9 @@ export function NotesScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>{t('notes.screenTitle')}</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t('notes.addHint')}</Text>
+      <View style={[styles.header, { alignItems: layoutAlignEnd() }]}>
+        <Text style={[styles.title, { color: colors.text }, rtl]}>{t('notes.screenTitle')}</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }, rtl]}>{t('notes.addHint')}</Text>
       </View>
 
       <ScrollView
@@ -104,7 +105,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
-    alignItems: alignItemsEnd,
     gap: spacing.xs,
   },
   title: {
@@ -114,7 +114,6 @@ const styles = StyleSheet.create({
   subtitle: {
     ...typography.caption,
     lineHeight: 20,
-    textAlign: 'right',
   },
   scroll: {
     flex: 1,

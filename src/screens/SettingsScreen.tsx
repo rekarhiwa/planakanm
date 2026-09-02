@@ -132,7 +132,7 @@ export function SettingsScreen() {
         </SettingSection>
 
         <SettingSection title={t('settings.language')} colors={colors} rtl={rtl}>
-          <View style={styles.chipRow}>
+          <View style={[styles.chipRow, { flexDirection: layoutRow() }]}>
             {(['ku', 'ar', 'en'] as AppLanguage[]).map((lang) => (
               <Chip
                 key={lang}
@@ -145,7 +145,7 @@ export function SettingsScreen() {
         </SettingSection>
 
         <SettingSection title={t('settings.theme')} colors={colors} rtl={rtl}>
-          <View style={styles.chipRow}>
+          <View style={[styles.chipRow, { flexDirection: layoutRow() }]}>
             {(['light', 'dark', 'system'] as ThemeMode[]).map((m) => (
               <Chip
                 key={m}
@@ -158,7 +158,7 @@ export function SettingsScreen() {
         </SettingSection>
 
         <SettingSection title={t('settings.defaultSnooze')} colors={colors} rtl={rtl}>
-          <View style={styles.chipRow}>
+          <View style={[styles.chipRow, { flexDirection: layoutRow() }]}>
             {[5, 10, 15, 30].map((min) => (
               <Chip
                 key={min}
@@ -188,7 +188,7 @@ export function SettingsScreen() {
         <SettingSection title="" colors={colors} rtl={rtl}>
           <Pressable
             onPress={() => navigation.navigate('About')}
-            style={[styles.aboutRow, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            style={[styles.aboutRow, { backgroundColor: colors.surface, borderColor: colors.border, flexDirection: layoutRow() }]}
           >
             <View style={styles.aboutText}>
               <Text style={[styles.aboutTitle, { color: colors.text }, rtl]}>{t('about.title')}</Text>
@@ -233,7 +233,6 @@ const styles = StyleSheet.create({
   sectionBody: { width: '100%' },
   sectionTitle: { ...typography.label, marginBottom: spacing.md, width: '100%' },
   chipRow: {
-    flexDirection: layoutRow(),
     flexWrap: 'wrap',
     gap: spacing.sm,
     justifyContent: 'flex-start',
@@ -248,7 +247,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   aboutRow: {
-    flexDirection: layoutRow(),
     alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.lg,

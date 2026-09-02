@@ -143,8 +143,8 @@ export function CalendarScreen() {
             </Text>
 
             <View style={[styles.monthHeaderRow, { flexDirection: layoutRow() }]}>
-              {weekdayHeaders.map((name) => (
-                <View key={name} style={styles.monthHeaderCell}>
+              {weekdayHeaders.map((name, index) => (
+                <View key={`${name}-${index}`} style={styles.monthHeaderCell}>
                   <Text style={[styles.monthHeaderText, { color: colors.textSecondary }, rtl]}>{name}</Text>
                 </View>
               ))}

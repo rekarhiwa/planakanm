@@ -19,7 +19,7 @@ export function ScreenHeader({ title, onBack, backLabel = '←', rightAction }: 
   const rtl = rtlTextStyle();
 
   return (
-    <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background }]}>
+    <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background, flexDirection: layoutRow() }]}>
       <Pressable onPress={onBack} hitSlop={12} style={styles.side}>
         <Text style={[styles.back, { color: colors.primary }, rtl]}>{backLabel}</Text>
       </Pressable>
@@ -41,7 +41,6 @@ export function ScreenHeader({ title, onBack, backLabel = '←', rightAction }: 
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: layoutRow(),
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,

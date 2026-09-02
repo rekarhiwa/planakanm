@@ -3,6 +3,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 
 import type { Category, Plan } from '../domain/entities/types';
 import { radius, spacing, typography } from '../theme/colors';
+import { getIsRTL, layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface PlanRowProps {
@@ -27,6 +28,7 @@ export function PlanRow({
   showTime = true,
 }: PlanRowProps) {
   const { colors } = useTheme();
+  const rtl = rtlTextStyle();
 
   const statusColor =
     plan.status === 'completed'
@@ -37,8 +39,8 @@ export function PlanRow({
           ? colors.snoozed
           : colors.textSecondary;
 
-  const renderRightActions = () => (
-    <View style={styles.actions}>
+  const renderCompleteAction = () => (
+    <View style={[styles.actions, { flexDirection: layoutRow() }]}>
       {onComplete && plan.status !== 'completed' && (
         <Pressable
           onPress={onComplete}
@@ -50,8 +52,8 @@ export function PlanRow({
     </View>
   );
 
-  const renderLeftActions = () => (
-    <View style={styles.actions}>
+  const renderSecondaryActions = () => (
+    <View style={[styles.actions, { flexDirection: layoutRow() }]}>
       {onSnooze && plan.status !== 'completed' && (
         <Pressable
           onPress={onSnooze}
@@ -76,6 +78,7 @@ export function PlanRow({
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
+        { flexDirection: layoutRow() },
         {
           backgroundColor: plan.status === 'completed' ? colors.completed : colors.surface,
           borderColor: colors.border,
@@ -88,11 +91,12 @@ export function PlanRow({
       )}
       {!plan.hasTime && <Text style={[styles.bullet, { color: colors.primary }]}>•</Text>}
 
-      <View style={styles.content}>
-        <View style={styles.titleRow}>
+      <View style={[styles.content, { alignItems: layoutAlignEnd() }]}>
+        <View style={[styles.titleRow, { flexDirection: layoutRow() }]}>
           <Text
             style={[
               styles.title,
+              rtl,
               {
                 color: plan.status === 'completed' ? colors.textSecondary : colors.text,
                 textDecorationLine: plan.status === 'completed' ? 'line-through' : 'none',
@@ -107,9 +111,9 @@ export function PlanRow({
           )}
         </View>
         {showCategory && category && (
-          <View style={[styles.categoryBadge, { backgroundColor: `${category.color}22` }]}>
+          <View style={[styles.categoryBadge, { flexDirection: layoutRow() }]}>
             <View style={[styles.categoryDot, { backgroundColor: category.color }]} />
-            <Text style={[styles.categoryText, { color: category.color }]} numberOfLines={1}>
+            <Text style={[styles.categoryText, { color: category.color }, rtl]} numberOfLines={1}>
               {category.name}
             </Text>
           </View>
@@ -129,8 +133,12 @@ export function PlanRow({
   );
 
   if (onComplete || onSnooze || onDelete) {
+    const isRtl = getIsRTL();
     return (
-      <Swipeable renderRightActions={renderRightActions} renderLeftActions={renderLeftActions}>
+      <Swipeable
+        renderRightActions={isRtl ? renderSecondaryActions : renderCompleteAction}
+        renderLeftActions={isRtl ? renderCompleteAction : renderSecondaryActions}
+      >
         {content}
       </Swipeable>
     );
@@ -141,7 +149,6 @@ export function PlanRow({
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
@@ -162,11 +169,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    alignItems: 'flex-end',
     gap: 4,
   },
   titleRow: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
     alignSelf: 'stretch',
@@ -174,11 +179,9 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.body,
-    textAlign: 'right',
     flexShrink: 1,
   },
   categoryBadge: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: spacing.sm,
@@ -210,7 +213,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   actions: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.sm,

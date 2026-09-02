@@ -2,6 +2,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useDialogStore } from '../stores/dialogStore';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { radius, spacing, typography } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -13,6 +14,7 @@ export function ConfirmDialog() {
   const options = useDialogStore((s) => s.options);
   const confirm = useDialogStore((s) => s.confirm);
   const cancel = useDialogStore((s) => s.cancel);
+  const rtl = rtlTextStyle();
 
   if (!options) return null;
 
@@ -30,19 +32,19 @@ export function ConfirmDialog() {
     <Modal visible={visible} transparent animationType="fade" onRequestClose={cancel}>
       <View style={styles.overlay}>
         <View style={[styles.dialog, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.title, { color: titleColor }]}>{options.title}</Text>
+          <Text style={[styles.title, { color: titleColor }, rtl]}>{options.title}</Text>
 
           {options.highlight ? (
-            <View style={[styles.highlight, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
+            <View style={[styles.highlight, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, flexDirection: layoutRow() }]}>
               <View style={[styles.highlightDot, { backgroundColor: options.highlight.color }]} />
-              <Text style={[styles.highlightLabel, { color: colors.text }]} numberOfLines={1}>
+              <Text style={[styles.highlightLabel, { color: colors.text }, rtl]} numberOfLines={1}>
                 {options.highlight.label}
               </Text>
             </View>
           ) : null}
 
           {options.message ? (
-            <Text style={[styles.message, { color: colors.textSecondary }]}>{options.message}</Text>
+            <Text style={[styles.message, { color: colors.textSecondary }, rtl]}>{options.message}</Text>
           ) : null}
 
           <View style={styles.actions}>
@@ -87,9 +89,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   highlight: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
   highlightLabel: {
     ...typography.label,
     flexShrink: 1,
-    textAlign: 'right',
   },
   message: {
     ...typography.body,

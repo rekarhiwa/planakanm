@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import type { AppSettings } from '../domain/entities/types';
 import * as settingsRepo from '../data/repositories/settingsRepository';
-import { changeLanguage, type AppLanguage } from '../i18n';
+import { changeLanguage, initI18n, type AppLanguage } from '../i18n';
 
 interface SettingsStore {
   settings: AppSettings;
@@ -28,7 +28,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
 
   loadSettings: async () => {
     const settings = await settingsRepo.getSettings();
-    await changeLanguage(settings.language);
+    await initI18n(settings.language);
     set({ settings, isLoaded: true });
   },
 
@@ -38,7 +38,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   },
 
   setLanguage: async (lang) => {
-    await changeLanguage(lang);
     await get().updateSettings({ language: lang });
+    await changeLanguage(lang);
   },
 }));
