@@ -324,6 +324,7 @@ const styles = StyleSheet.create({
   },
   timeColumns: {
     flexDirection: 'row',
+    direction: 'ltr',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,

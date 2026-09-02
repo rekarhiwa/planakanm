@@ -28,7 +28,25 @@ import { spacing, typography } from '../theme/colors';
 import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import type { SnoozeSelection } from '../domain/services/snoozeEngine';
-import { getGreetingKey, groupPlansByTime, isPlanNow } from '../utils/dates';
+import {
+  getGreetingKey,
+  getPlanRemainingParts,
+  getScheduledDateTime,
+  groupPlansByTime,
+  isPlanNow,
+} from '../utils/dates';
+
+function formatRemainingLabel(
+  plan: Plan,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  const remaining = getPlanRemainingParts(plan);
+  if (!remaining) return '';
+  if (remaining.dueNow) return t('home.dueNow');
+  if (remaining.hours === 0) return t('home.remainingMinutes', { count: remaining.minutes });
+  if (remaining.minutes === 0) return t('home.remainingHoursOnly', { hours: remaining.hours });
+  return t('home.remainingHours', { hours: remaining.hours, minutes: remaining.minutes });
+}
 
 export function HomeScreen() {
   const { colors } = useTheme();
@@ -90,6 +108,24 @@ export function HomeScreen() {
   const upcomingPlans = plans.filter(
     (p) => p.status === 'pending' && p.hasTime && !isPlanNow(p),
   );
+  const nearestPlanId = useMemo(() => {
+    const candidates = plans.filter(
+      (p) => (p.status === 'pending' || p.status === 'overdue') && p.hasTime && p.time,
+    );
+    let bestId: string | undefined;
+    let bestDiff = Number.POSITIVE_INFINITY;
+    const now = Date.now();
+    for (const plan of candidates) {
+      const scheduled = getScheduledDateTime(plan);
+      if (!scheduled) continue;
+      const diff = Math.abs(scheduled.getTime() - now);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestId = plan.id;
+      }
+    }
+    return bestId;
+  }, [plans]);
 
   const handlePlanPress = useCallback(
     (plan: Plan) => navigation.navigate('PlanDetail', { planId: plan.id }),
@@ -136,6 +172,8 @@ export function HomeScreen() {
     plan,
     category: categories.find((c) => c.id === plan.categoryId),
     showCategory: categories.length > 0,
+    remainingLabel:
+      plan.id === nearestPlanId && !nowPlan ? formatRemainingLabel(plan, t) : undefined,
   });
 
   return (

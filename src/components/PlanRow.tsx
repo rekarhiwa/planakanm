@@ -15,6 +15,7 @@ interface PlanRowProps {
   onSnooze?: () => void;
   onDelete?: () => void;
   showTime?: boolean;
+  remainingLabel?: string;
 }
 
 export function PlanRow({
@@ -26,6 +27,7 @@ export function PlanRow({
   onSnooze,
   onDelete,
   showTime = true,
+  remainingLabel,
 }: PlanRowProps) {
   const { colors } = useTheme();
   const rtl = rtlTextStyle();
@@ -86,11 +88,6 @@ export function PlanRow({
         },
       ]}
     >
-      {showTime && plan.hasTime && plan.time && (
-        <Text style={[styles.time, { color: colors.primary }]}>{plan.time}</Text>
-      )}
-      {!plan.hasTime && <Text style={[styles.bullet, { color: colors.primary }]}>•</Text>}
-
       <View style={[styles.content, { alignItems: layoutAlignEnd() }]}>
         <View style={[styles.titleRow, { flexDirection: layoutRow() }]}>
           <Text
@@ -110,6 +107,11 @@ export function PlanRow({
             <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
           )}
         </View>
+        {remainingLabel ? (
+          <Text style={[styles.remaining, { color: colors.textSecondary }, rtl]} numberOfLines={1}>
+            {remainingLabel}
+          </Text>
+        ) : null}
         {showCategory && category && (
           <View style={[styles.categoryBadge, { flexDirection: layoutRow() }]}>
             <View style={[styles.categoryDot, { backgroundColor: category.color }]} />
@@ -119,6 +121,11 @@ export function PlanRow({
           </View>
         )}
       </View>
+
+      {showTime && plan.hasTime && plan.time ? (
+        <Text style={[styles.time, { color: colors.primary }]}>{plan.time}</Text>
+      ) : null}
+      {!plan.hasTime ? <Text style={[styles.bullet, { color: colors.primary }]}>•</Text> : null}
 
       {onComplete && plan.status !== 'completed' && (
         <Pressable
@@ -180,6 +187,10 @@ const styles = StyleSheet.create({
   title: {
     ...typography.body,
     flexShrink: 1,
+  },
+  remaining: {
+    ...typography.caption,
+    alignSelf: 'stretch',
   },
   categoryBadge: {
     alignItems: 'center',

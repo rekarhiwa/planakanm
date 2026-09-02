@@ -1,4 +1,4 @@
-import type { TextStyle, ViewStyle } from 'react-native';
+import { I18nManager, type TextStyle, type ViewStyle } from 'react-native';
 
 import { isRtlLanguage, type AppLanguage } from '../i18n/languages';
 
@@ -8,8 +8,17 @@ export function setLayoutLanguage(language: AppLanguage) {
   layoutLanguage = language;
 }
 
+/** Desired reading direction from the selected app language. */
 export function getIsRTL(): boolean {
   return isRtlLanguage(layoutLanguage);
+}
+
+/**
+ * Native I18nManager may stay LTR even when we want RTL (forceRTL needs a full
+ * restart). Mirror flex rows/alignment when language and native disagree.
+ */
+function needsLayoutMirror(): boolean {
+  return getIsRTL() !== I18nManager.isRTL;
 }
 
 export function rtlTextStyle(): TextStyle {
@@ -23,17 +32,13 @@ export function rtlTextStyle(): TextStyle {
 /** @deprecated Use rtlTextStyle() for runtime-correct direction. */
 export const rtlText: TextStyle = rtlTextStyle();
 
-/**
- * Row direction for manual RTL layouts.
- * React Native does NOT auto-flip flexDirection when forceRTL is on,
- * so RTL languages need row-reverse to put the first child on the right.
- */
 export function layoutRow(): ViewStyle['flexDirection'] {
-  return getIsRTL() ? 'row-reverse' : 'row';
+  return needsLayoutMirror() ? 'row-reverse' : 'row';
 }
 
+/** Align children toward the reading-start edge (right in RTL languages). */
 export function layoutAlignEnd(): ViewStyle['alignItems'] {
-  return getIsRTL() ? 'flex-start' : 'flex-end';
+  return needsLayoutMirror() ? 'flex-end' : 'flex-start';
 }
 
 export function edgeStart(): 'left' | 'right' {

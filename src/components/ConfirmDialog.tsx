@@ -2,7 +2,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useDialogStore } from '../stores/dialogStore';
-import { layoutRow, rtlTextStyle } from '../theme/rtl';
+import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { radius, spacing, typography } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -35,7 +35,7 @@ export function ConfirmDialog() {
           <Text style={[styles.title, { color: titleColor }, rtl]}>{options.title}</Text>
 
           {options.highlight ? (
-            <View style={[styles.highlight, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, flexDirection: layoutRow() }]}>
+            <View style={[styles.highlight, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, flexDirection: layoutRow(), alignItems: layoutAlignEnd() }]}>
               <View style={[styles.highlightDot, { backgroundColor: options.highlight.color }]} />
               <Text style={[styles.highlightLabel, { color: colors.text }, rtl]} numberOfLines={1}>
                 {options.highlight.label}
@@ -89,7 +89,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   highlight: {
-    alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,

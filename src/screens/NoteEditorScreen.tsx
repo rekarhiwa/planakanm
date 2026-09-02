@@ -27,7 +27,7 @@ import { useNoteStore } from '../stores/noteStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { radius, spacing, typography } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
-import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { formatTimeDisplay, getTodayISO } from '../utils/dates';
 
@@ -166,7 +166,7 @@ export function NoteEditorScreen() {
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+          <View style={styles.block}>
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('notes.noteTitle')}</Text>
             <FontTextInput
               style={[styles.titleInput, { color: colors.text }]}
@@ -182,7 +182,7 @@ export function NoteEditorScreen() {
             />
           </View>
 
-          <View style={[styles.block, { alignItems: layoutAlignEnd() }]}>
+          <View style={styles.block}>
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('notes.noteBody')}</Text>
             <FontTextInput
               ref={bodyRef}
@@ -202,17 +202,17 @@ export function NoteEditorScreen() {
 
           {hasAlarm ? (
             <View style={[styles.alarmBlock, { borderTopColor: colors.border }]}>
-              <Text style={[styles.fieldLabel, { color: colors.primary }]}>{t('notes.hasAlarm')}</Text>
+              <Text style={[styles.fieldLabel, { color: colors.primary }, rtl]}>{t('notes.hasAlarm')}</Text>
 
               <View style={styles.block}>
-                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.pickDate')}</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.pickDate')}</Text>
                 <View style={styles.dateSelectorWrap}>
                   <DateSelector selectedDate={alarmDate} onSelectDate={setAlarmDate} />
                 </View>
               </View>
 
               <View style={styles.block}>
-                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('create.setTime')}</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.setTime')}</Text>
                 {timePreview ? (
                   <Text style={[styles.timePreview, { color: colors.text }]}>{timePreview}</Text>
                 ) : null}
@@ -265,6 +265,8 @@ const styles = StyleSheet.create({
   },
   block: {
     gap: spacing.sm,
+    width: '100%',
+    alignSelf: 'stretch',
   },
   fieldLabel: {
     ...typography.caption,
@@ -294,9 +296,13 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingTop: spacing.lg,
+    width: '100%',
+    alignSelf: 'stretch',
   },
   dateSelectorWrap: {
     marginHorizontal: -spacing.xl,
+    alignSelf: 'stretch',
+    width: '100%',
   },
   timePreview: {
     fontFamily: FONT_FAMILY,
