@@ -85,7 +85,7 @@ export interface PlanHistory {
 }
 
 export interface AppSettings {
-  language: 'ku' | 'ar' | 'en';
+  language: 'ku' | 'en';
   theme: 'light' | 'dark' | 'system';
   defaultReminderType: ReminderType;
   defaultSnoozeMinutes: number;

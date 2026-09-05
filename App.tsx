@@ -4,36 +4,78 @@ import 'react-native-reanimated';
 import { useFonts } from 'expo-font';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import { AppNavigation } from './src/navigation';
+import { AlarmScreen } from './src/components/AlarmScreen';
 import { ConfirmDialog } from './src/components/ConfirmDialog';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { SnoozePicker } from './src/components/SnoozePicker';
 import { initDatabase } from './src/data/db/client';
 import { navigateToPlanDetail } from './src/navigation/navigationRef';
 import { requestAppPermissions } from './src/permissions';
+import { isFullscreenReminder, setAlarmReceivedHandler } from './src/notifications/alarmBridge';
+import { consumePendingAlarm, queuePendingAlarm } from './src/notifications/alarmQueue';
 import {
+  addNotificationReceivedListener,
   addNotificationResponseListener,
   clearLastNotificationResponse,
-  consumePendingNotificationLaunch,
+  consumePendingAlarmLaunch,
   dismissPlanNotifications,
   reconcileAllNotifications,
   setupNotificationChannels,
 } from './src/notifications/scheduler';
 import { usePlanStore } from './src/stores/planStore';
 import { useSettingsStore } from './src/stores/settingsStore';
+import { useUIStore } from './src/stores/uiStore';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import type { SnoozeSelection } from './src/domain/services/snoozeEngine';
 
 function AppContent() {
   const { colors } = useTheme();
+  const language = useSettingsStore((s) => s.settings.language);
   const completePlan = usePlanStore((s) => s.completePlan);
   const snoozePlan = usePlanStore((s) => s.snoozePlan);
+  const showAlarmScreen = useUIStore((s) => s.showAlarmScreen);
+  const alarmPlanId = useUIStore((s) => s.alarmPlanId);
+  const openAlarmScreen = useUIStore((s) => s.openAlarmScreen);
+  const closeAlarmScreen = useUIStore((s) => s.closeAlarmScreen);
+  const showSnoozeSheet = useUIStore((s) => s.showSnoozeSheet);
+  const snoozePlanId = useUIStore((s) => s.snoozePlanId);
+  const closeSnooze = useUIStore((s) => s.closeSnooze);
+
+  useEffect(() => {
+    setAlarmReceivedHandler((planId) => {
+      if (AppState.currentState === 'active') {
+        openAlarmScreen(planId);
+        return;
+      }
+      void queuePendingAlarm(planId);
+    });
+    return () => setAlarmReceivedHandler(null);
+  }, [openAlarmScreen]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      void consumePendingAlarm().then((planId) => {
+        if (planId) openAlarmScreen(planId);
+      });
+    });
+
+    void consumePendingAlarm().then((planId) => {
+      if (planId) openAlarmScreen(planId);
+    });
+
+    return () => sub.remove();
+  }, [openAlarmScreen]);
 
   useEffect(() => {
     let responseSub: { remove: () => void } = { remove: () => {} };
+    let receivedSub: { remove: () => void } = { remove: () => {} };
     let cancelled = false;
 
     void (async () => {
@@ -41,9 +83,9 @@ function AppContent() {
         await setupNotificationChannels();
         await reconcileAllNotifications();
 
-        const pendingPlanId = await consumePendingNotificationLaunch();
+        const pendingPlanId = await consumePendingAlarmLaunch();
         if (pendingPlanId) {
-          navigateToPlanDetail(pendingPlanId);
+          openAlarmScreen(pendingPlanId);
         }
       } catch {
         // Notifications are unavailable in Expo Go.
@@ -51,13 +93,24 @@ function AppContent() {
 
       if (cancelled) return;
 
-      responseSub = await addNotificationResponseListener(async (planId, action) => {
+      receivedSub = await addNotificationReceivedListener((planId, reminderType) => {
+        if (!isFullscreenReminder(reminderType) && reminderType !== undefined) return;
+        if (AppState.currentState === 'active') {
+          openAlarmScreen(planId);
+          return;
+        }
+        void queuePendingAlarm(planId);
+      });
+
+      responseSub = await addNotificationResponseListener(async (planId, action, reminderType) => {
         if (action === 'complete') {
           await dismissPlanNotifications(planId);
           await completePlan(planId);
         } else if (action.includes('snooze')) {
           await dismissPlanNotifications(planId);
           await snoozePlan(planId, { kind: 'preset', key: '15min' });
+        } else if (isFullscreenReminder(reminderType) || reminderType !== 'notification') {
+          openAlarmScreen(planId);
         } else {
           navigateToPlanDetail(planId);
         }
@@ -68,14 +121,29 @@ function AppContent() {
     return () => {
       cancelled = true;
       responseSub.remove();
+      receivedSub.remove();
     };
-  }, [completePlan, snoozePlan]);
+  }, [completePlan, openAlarmScreen, snoozePlan]);
+
+  const handleSnoozeSelect = async (selection: SnoozeSelection) => {
+    if (snoozePlanId) await snoozePlan(snoozePlanId, selection);
+  };
 
   return (
     <>
       <StatusBar style={colors.statusBar} />
-      <AppNavigation />
+      <AppNavigation key={language} />
       <ConfirmDialog />
+      {showAlarmScreen && alarmPlanId ? (
+        <AlarmScreen planId={alarmPlanId} onClose={closeAlarmScreen} />
+      ) : null}
+      <SnoozePicker
+        visible={showSnoozeSheet}
+        onClose={closeSnooze}
+        onSelect={(selection) => {
+          void handleSnoozeSelect(selection);
+        }}
+      />
     </>
   );
 }

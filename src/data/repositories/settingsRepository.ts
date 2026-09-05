@@ -7,7 +7,7 @@ import { settings } from '../db/schema';
 const DEFAULT_SETTINGS: AppSettings = {
   language: 'ku',
   theme: 'system',
-  defaultReminderType: 'notification',
+  defaultReminderType: 'alarm',
   defaultSnoozeMinutes: 15,
   weekStartsOn: 6,
   timeFormat: '12h',
@@ -29,7 +29,11 @@ export async function getSettings(): Promise<AppSettings> {
       (stored as Record<string, unknown>)[row.key] = row.value;
     }
   }
-  return { ...DEFAULT_SETTINGS, ...stored };
+  return {
+    ...DEFAULT_SETTINGS,
+    ...stored,
+    language: stored.language === 'en' ? 'en' : 'ku',
+  };
 }
 
 export async function updateSetting<K extends keyof AppSettings>(

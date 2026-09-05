@@ -53,7 +53,7 @@ export async function createPlan(input: CreatePlanInput): Promise<Plan> {
     categoryId: input.categoryId,
     repeatType: input.repeatType ?? 'none',
     repeatRule: input.repeatRule,
-    reminderType: input.reminderType ?? 'notification',
+    reminderType: input.reminderType ?? 'alarm',
     originalScheduledAt: hasTime && input.time ? `${input.date}T${input.time}` : input.date,
     createdAt: now,
     updatedAt: now,

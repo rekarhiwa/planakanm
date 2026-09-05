@@ -27,7 +27,7 @@ import { useNoteStore } from '../stores/noteStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { radius, spacing, typography } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
-import { layoutRow, rtlTextStyle } from '../theme/rtl';
+import { contentDirectionStyle, layoutRow, ltrTextStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { formatTimeDisplay, getTodayISO } from '../utils/dates';
 
@@ -161,7 +161,7 @@ export function NoteEditorScreen() {
       >
         <ScrollView
           style={styles.flex}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, contentDirectionStyle()]}
           keyboardShouldPersistTaps="handled"
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
@@ -214,7 +214,7 @@ export function NoteEditorScreen() {
               <View style={styles.block}>
                 <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.setTime')}</Text>
                 {timePreview ? (
-                  <Text style={[styles.timePreview, { color: colors.text }]}>{timePreview}</Text>
+                  <Text style={[styles.timePreview, { color: colors.text }, ltrTextStyle()]}>{timePreview}</Text>
                 ) : null}
                 <TimePicker value={alarmTime} onChange={setAlarmTime} />
               </View>
@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontWeight: '600',
     alignSelf: 'stretch',
+    width: '100%',
   },
   titleInput: {
     fontFamily: FONT_FAMILY,

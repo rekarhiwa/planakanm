@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import type { AppSettings } from '../domain/entities/types';
 import * as settingsRepo from '../data/repositories/settingsRepository';
-import { changeLanguage, initI18n, type AppLanguage } from '../i18n';
+import { changeLanguage, initI18n, normalizeLanguage, type AppLanguage } from '../i18n';
 
 interface SettingsStore {
   settings: AppSettings;
@@ -16,7 +16,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   settings: {
     language: 'ku',
     theme: 'system',
-    defaultReminderType: 'notification',
+    defaultReminderType: 'alarm',
     defaultSnoozeMinutes: 15,
     weekStartsOn: 6,
     timeFormat: '12h',
@@ -27,18 +27,34 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   isLoaded: false,
 
   loadSettings: async () => {
-    const settings = await settingsRepo.getSettings();
-    await initI18n(settings.language);
+    const loaded = await settingsRepo.getSettings();
+    const language = normalizeLanguage(loaded.language);
+    const settings: AppSettings = {
+      ...loaded,
+      language,
+      defaultReminderType:
+        loaded.defaultReminderType === 'notification' ? 'alarm' : loaded.defaultReminderType,
+    };
+    if (loaded.language !== language || loaded.defaultReminderType === 'notification') {
+      await settingsRepo.updateSettings({
+        language,
+        defaultReminderType: settings.defaultReminderType,
+      });
+    }
+    await initI18n(language);
     set({ settings, isLoaded: true });
   },
 
   updateSettings: async (partial) => {
-    await settingsRepo.updateSettings(partial);
-    set({ settings: { ...get().settings, ...partial } });
+    const next = { ...partial };
+    if (next.language) next.language = normalizeLanguage(next.language);
+    await settingsRepo.updateSettings(next);
+    set({ settings: { ...get().settings, ...next } });
   },
 
   setLanguage: async (lang) => {
-    await get().updateSettings({ language: lang });
-    await changeLanguage(lang);
+    const language = normalizeLanguage(lang);
+    await get().updateSettings({ language });
+    await changeLanguage(language);
   },
 }));

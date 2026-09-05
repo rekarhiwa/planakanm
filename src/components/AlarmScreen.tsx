@@ -19,8 +19,10 @@ import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { radius, spacing, typography } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
+import { layoutRow, ltrTextStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { formatTimeDisplay } from '../utils/dates';
+import { dismissPlanNotifications } from '../notifications/scheduler';
 
 const MONO_FONT = Platform.select({
   ios: 'Menlo',
@@ -36,6 +38,7 @@ interface AlarmScreenProps {
 export function AlarmScreen({ planId, onClose }: AlarmScreenProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const rtl = rtlTextStyle();
   const timeFormat = useSettingsStore((s) => s.settings.timeFormat);
   const vibrationEnabled = useSettingsStore((s) => s.settings.vibrationEnabled);
   const completePlan = usePlanStore((s) => s.completePlan);
@@ -53,8 +56,9 @@ export function AlarmScreen({ planId, onClose }: AlarmScreenProps) {
   useEffect(() => {
     if (!vibrationEnabled) return undefined;
 
-    const pattern = [0, 400, 200, 400];
-    Vibration.vibrate(pattern, false);
+    // Continuous phone-style vibration pattern.
+    const pattern = [0, 600, 200, 600, 200, 600, 800];
+    Vibration.vibrate(pattern, true);
 
     const timer = setInterval(() => {
       pulse.current += 1;
@@ -76,12 +80,14 @@ export function AlarmScreen({ planId, onClose }: AlarmScreenProps) {
 
   const handleSnooze = useCallback(async () => {
     Vibration.cancel();
+    await dismissPlanNotifications(planId);
     await snoozePlan(planId, { kind: 'preset', key: '15min' });
     onClose();
   }, [onClose, planId, snoozePlan]);
 
   const handleComplete = useCallback(async () => {
     Vibration.cancel();
+    await dismissPlanNotifications(planId);
     await completePlan(planId);
     onClose();
   }, [completePlan, onClose, planId]);
@@ -92,10 +98,11 @@ export function AlarmScreen({ planId, onClose }: AlarmScreenProps) {
     onClose();
   }, [onClose, openSnooze, planId]);
 
-  const handleDismiss = useCallback(() => {
+  const handleDismiss = useCallback(async () => {
     Vibration.cancel();
+    await dismissPlanNotifications(planId);
     onClose();
-  }, [onClose]);
+  }, [onClose, planId]);
 
   return (
     <Modal visible animationType="fade" presentationStyle="fullScreen" statusBarTranslucent>
@@ -103,16 +110,16 @@ export function AlarmScreen({ planId, onClose }: AlarmScreenProps) {
         <View style={styles.glow} />
 
         <View style={styles.content}>
-          <Text style={[styles.badge, { color: colors.primary }]}>{t('alarm.fullscreenBadge')}</Text>
+          <Text style={[styles.badge, { color: colors.primary }, rtl]}>{t('alarm.fullscreenBadge')}</Text>
           <AlarmIcon color={colors.primary} size={56} />
-          {timeLabel && (
-            <Text style={[styles.time, { color: colors.text }]}>{timeLabel}</Text>
-          )}
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={3}>
+          {timeLabel ? (
+            <Text style={[styles.time, { color: colors.text }, ltrTextStyle()]}>{timeLabel}</Text>
+          ) : null}
+          <Text style={[styles.title, { color: colors.text }, rtl]} numberOfLines={3}>
             {plan?.title ?? t('common.loading')}
           </Text>
           {plan?.description ? (
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={2}>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }, rtl]} numberOfLines={2}>
               {plan.description}
             </Text>
           ) : null}
@@ -120,31 +127,40 @@ export function AlarmScreen({ planId, onClose }: AlarmScreenProps) {
 
         <View style={styles.actions}>
           <Pressable
-            onPress={handleSnooze}
+            onPress={() => {
+              void handleSnooze();
+            }}
             style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
           >
-            <Text style={[styles.primaryBtnText, { color: colors.fabText }]}>
+            <Text style={[styles.primaryBtnText, { color: colors.fabText }, rtl]}>
               {t('alarm.snooze15')}
             </Text>
           </Pressable>
 
-          <View style={styles.secondaryRow}>
+          <View style={[styles.secondaryRow, { flexDirection: layoutRow() }]}>
             <Pressable
-              onPress={handleComplete}
+              onPress={() => {
+                void handleComplete();
+              }}
               style={[styles.secondaryBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
             >
-              <Text style={[styles.secondaryBtnText, { color: colors.text }]}>{t('alarm.complete')}</Text>
+              <Text style={[styles.secondaryBtnText, { color: colors.text }, rtl]}>{t('alarm.complete')}</Text>
             </Pressable>
             <Pressable
               onPress={handleCustomSnooze}
               style={[styles.secondaryBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
             >
-              <Text style={[styles.secondaryBtnText, { color: colors.text }]}>{t('alarm.customSnooze')}</Text>
+              <Text style={[styles.secondaryBtnText, { color: colors.text }, rtl]}>{t('alarm.customSnooze')}</Text>
             </Pressable>
           </View>
 
-          <Pressable onPress={handleDismiss} style={styles.dismissBtn}>
-            <Text style={[styles.dismissText, { color: colors.textSecondary }]}>{t('alarm.dismiss')}</Text>
+          <Pressable
+            onPress={() => {
+              void handleDismiss();
+            }}
+            style={styles.dismissBtn}
+          >
+            <Text style={[styles.dismissText, { color: colors.textSecondary }, rtl]}>{t('alarm.dismiss')}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -178,16 +194,15 @@ const styles = StyleSheet.create({
   },
   badge: {
     fontFamily: FONT_FAMILY,
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 1.2,
-    textTransform: 'uppercase',
   },
   time: {
     fontFamily: MONO_FONT,
-    fontSize: 34,
+    fontSize: 42,
     fontWeight: '600',
     letterSpacing: 1,
-    lineHeight: 40,
+    lineHeight: 48,
   },
   title: {
     ...typography.display,
@@ -195,12 +210,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 34,
     marginTop: spacing.sm,
+    alignSelf: 'stretch',
   },
   subtitle: {
     ...typography.body,
     textAlign: 'center',
     lineHeight: 22,
     paddingHorizontal: spacing.lg,
+    alignSelf: 'stretch',
   },
   actions: {
     gap: spacing.md,
@@ -215,7 +232,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   secondaryRow: {
-    flexDirection: 'row',
     gap: spacing.sm,
   },
   secondaryBtn: {

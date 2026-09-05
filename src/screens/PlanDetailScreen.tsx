@@ -14,7 +14,7 @@ import { useDialogStore } from '../stores/dialogStore';
 import { usePlanStore } from '../stores/planStore';
 import { useUIStore } from '../stores/uiStore';
 import { radius, spacing, typography } from '../theme/colors';
-import { getIsRTL, layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
+import { backChevron, layoutAlignEnd, layoutRow, ltrTextStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 export function PlanDetailScreen() {
@@ -101,7 +101,7 @@ export function PlanDetailScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <Pressable onPress={() => navigation.goBack()} style={styles.back}>
           <Text style={[{ color: colors.primary, ...typography.label }, rtl]}>
-            {getIsRTL() ? '→' : '←'}
+            {backChevron()}
           </Text>
         </Pressable>
 
@@ -109,9 +109,9 @@ export function PlanDetailScreen() {
         <Text style={[styles.status, { color: colors.primary }, rtl]}>{t(`status.${plan.status}`)}</Text>
 
         <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <InfoRow label={t('detail.date')} value={plan.date} colors={colors} />
+          <InfoRow label={t('detail.date')} value={plan.date} colors={colors} ltrValue />
           {plan.hasTime && plan.time && (
-            <InfoRow label={t('detail.time')} value={plan.time} colors={colors} />
+            <InfoRow label={t('detail.time')} value={plan.time} colors={colors} ltrValue />
           )}
           <InfoRow label={t('detail.repeat')} value={t(`create.${plan.repeatType === 'none' ? 'noRepeat' : plan.repeatType}`)} colors={colors} />
           <InfoRow label={t('detail.priority')} value={t(`priority.${plan.priority}`)} colors={colors} />
@@ -181,17 +181,20 @@ function InfoRow({
   label,
   value,
   colors,
+  ltrValue = false,
 }: {
   label: string;
   value: string;
   colors: { text: string; textSecondary: string };
+  ltrValue?: boolean;
 }) {
   const rtl = rtlTextStyle();
+  const valueStyle = ltrValue ? ltrTextStyle() : rtl;
 
   return (
     <View style={[styles.infoRow, { flexDirection: layoutRow() }]}>
       <Text style={[{ color: colors.textSecondary, ...typography.caption }, rtl]}>{label}</Text>
-      <Text style={[{ color: colors.text, ...typography.body }, rtl]}>{value}</Text>
+      <Text style={[{ color: colors.text, ...typography.body }, valueStyle]}>{value}</Text>
     </View>
   );
 }

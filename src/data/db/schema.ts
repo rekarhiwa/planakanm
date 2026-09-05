@@ -14,7 +14,7 @@ export const plans = sqliteTable(
     categoryId: text('category_id'),
     repeatType: text('repeat_type').notNull().default('none'),
     repeatRule: text('repeat_rule'),
-    reminderType: text('reminder_type').notNull().default('notification'),
+    reminderType: text('reminder_type').notNull().default('alarm'),
     reminderSound: text('reminder_sound'),
     notificationId: text('notification_id'),
     snoozedUntil: text('snoozed_until'),

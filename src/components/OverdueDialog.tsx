@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { SNOOZE_PRESETS } from '../domain/constants/snoozePresets';
 import { radius, spacing, typography } from '../theme/colors';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface OverdueDialogProps {
@@ -22,29 +23,30 @@ export function OverdueDialog({
 }: OverdueDialogProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const rtl = rtlTextStyle();
 
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={[styles.dialog, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.title, { color: colors.overdue }]}>
+          <Text style={[styles.title, { color: colors.overdue }, rtl]}>
             {t('snooze.overdueTitle')}
           </Text>
-          {planTitle && (
-            <Text style={[styles.planTitle, { color: colors.text }]}>{planTitle}</Text>
-          )}
-          <Text style={[styles.question, { color: colors.textSecondary }]}>
+          {planTitle ? (
+            <Text style={[styles.planTitle, { color: colors.text }, rtl]}>{planTitle}</Text>
+          ) : null}
+          <Text style={[styles.question, { color: colors.textSecondary }, rtl]}>
             {t('snooze.missedQuestion')}
           </Text>
 
-          <View style={styles.options}>
+          <View style={[styles.options, { flexDirection: layoutRow() }]}>
             {SNOOZE_PRESETS.filter((p) => p.key !== 'custom').map((preset) => (
               <Pressable
                 key={preset.key}
                 onPress={() => onSnooze(preset.key)}
                 style={[styles.option, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}
               >
-                <Text style={[styles.optionText, { color: colors.text }]}>
+                <Text style={[styles.optionText, { color: colors.text }, rtl]}>
                   {t(preset.labelKey)}
                 </Text>
               </Pressable>
@@ -53,10 +55,10 @@ export function OverdueDialog({
 
           <View style={styles.actions}>
             <Pressable onPress={onComplete} style={[styles.actionBtn, { backgroundColor: colors.primary }]}>
-              <Text style={{ color: colors.fabText, ...typography.label }}>{t('snooze.doNow')}</Text>
+              <Text style={[{ color: colors.fabText, ...typography.label }, rtl]}>{t('snooze.doNow')}</Text>
             </Pressable>
             <Pressable onPress={onDismiss} style={styles.dismissBtn}>
-              <Text style={{ color: colors.textSecondary }}>{t('common.cancel')}</Text>
+              <Text style={[{ color: colors.textSecondary }, rtl]}>{t('common.cancel')}</Text>
             </Pressable>
           </View>
         </View>
@@ -79,22 +81,18 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.title,
-    textAlign: 'center',
     marginBottom: spacing.sm,
   },
   planTitle: {
     ...typography.body,
-    textAlign: 'center',
     fontWeight: '700',
     marginBottom: spacing.sm,
   },
   question: {
     ...typography.body,
-    textAlign: 'center',
     marginBottom: spacing.lg,
   },
   options: {
-    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
     justifyContent: 'center',

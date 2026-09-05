@@ -7,7 +7,7 @@ import { requestAppPermissions } from '../permissions';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { radius, spacing, typography } from '../theme/colors';
-import { rtlTextStyle } from '../theme/rtl';
+import { contentDirectionStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 const FEATURE_STEPS = [
@@ -54,7 +54,7 @@ export function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }, contentDirectionStyle()]}>
       <View style={styles.content}>
         {isProfileStep ? (
           <>

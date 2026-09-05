@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from '../components/ScreenHeader';
 import type { SettingsStackParamList } from '../navigation';
 import { radius, spacing, typography } from '../theme/colors';
-import { rtlTextStyle } from '../theme/rtl';
+import { ltrTextStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 const appIcon = require('../../assets/icon.png');
@@ -37,7 +37,7 @@ export function AboutScreen() {
           <Text style={[styles.description, { color: colors.textSecondary }, rtl]}>
             {t('about.description')}
           </Text>
-          <Text style={[styles.version, { color: colors.primary }, rtl]}>
+          <Text style={[styles.version, { color: colors.primary }, ltrTextStyle()]}>
             {t('about.versionLabel', { version })}
           </Text>
         </View>

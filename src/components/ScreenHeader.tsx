@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { spacing, typography } from '../theme/colors';
-import { layoutRow, rtlTextStyle } from '../theme/rtl';
+import { backChevron, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface ScreenHeaderProps {
@@ -14,23 +14,35 @@ interface ScreenHeaderProps {
   };
 }
 
-export function ScreenHeader({ title, onBack, backLabel = '←', rightAction }: ScreenHeaderProps) {
+export function ScreenHeader({ title, onBack, backLabel, rightAction }: ScreenHeaderProps) {
   const { colors } = useTheme();
   const rtl = rtlTextStyle();
+  const chevron = backLabel ?? backChevron();
 
   return (
-    <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background, flexDirection: layoutRow() }]}>
+    <View
+      style={[
+        styles.header,
+        {
+          borderBottomColor: colors.border,
+          backgroundColor: colors.background,
+          flexDirection: layoutRow(),
+        },
+      ]}
+    >
       <Pressable onPress={onBack} hitSlop={12} style={styles.side}>
-        <Text style={[styles.back, { color: colors.primary }, rtl]}>{backLabel}</Text>
+        <Text style={[styles.back, { color: colors.primary }, rtl]}>{chevron}</Text>
       </Pressable>
 
-      <Text style={[styles.title, { color: colors.text }, rtl]} numberOfLines={1}>
+      <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
         {title}
       </Text>
 
       {rightAction ? (
-        <Pressable onPress={rightAction.onPress} hitSlop={12} style={styles.side}>
-          <Text style={[styles.back, { color: colors.primary, fontWeight: '600' }, rtl]}>{rightAction.label}</Text>
+        <Pressable onPress={rightAction.onPress} hitSlop={12} style={[styles.side, styles.sideEnd]}>
+          <Text style={[styles.back, { color: colors.primary, fontWeight: '600' }, rtl]}>
+            {rightAction.label}
+          </Text>
         </Pressable>
       ) : (
         <View style={styles.side} />
@@ -50,6 +62,9 @@ const styles = StyleSheet.create({
   side: {
     minWidth: 72,
     alignItems: 'flex-start',
+  },
+  sideEnd: {
+    alignItems: 'flex-end',
   },
   back: {
     ...typography.label,

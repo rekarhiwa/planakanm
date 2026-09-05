@@ -25,7 +25,7 @@ import { usePlanStore } from '../stores/planStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { radius, spacing, typography } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
-import { layoutRow, rtlTextStyle } from '../theme/rtl';
+import { contentDirectionStyle, layoutRow, ltrTextStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { formatTime24, formatTimeDisplay, getTodayISO } from '../utils/dates';
 
@@ -89,7 +89,7 @@ export function CreatePlanScreen() {
     let input;
     const parsed = parseNaturalLanguage(title);
     if (parsed.confidence === 'high') {
-      input = { ...parsedToCreateInput(parsed), reminderType: 'notification' as const };
+      input = { ...parsedToCreateInput(parsed), reminderType: 'alarm' as const };
     } else {
       input = {
         title: title.trim(),
@@ -99,7 +99,7 @@ export function CreatePlanScreen() {
         hasTime: true,
         repeatType,
         priority,
-        reminderType: 'notification' as const,
+        reminderType: 'alarm' as const,
         categoryId,
       };
     }
@@ -143,7 +143,7 @@ export function CreatePlanScreen() {
       >
         <ScrollView
           style={styles.flex}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, contentDirectionStyle()]}
           keyboardShouldPersistTaps="handled"
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
@@ -190,7 +190,7 @@ export function CreatePlanScreen() {
           <View style={styles.block}>
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }, rtl]}>{t('create.setTime')}</Text>
             {timePreview ? (
-              <Text style={[styles.timePreview, { color: colors.text }]}>{timePreview}</Text>
+              <Text style={[styles.timePreview, { color: colors.text }, ltrTextStyle()]}>{timePreview}</Text>
             ) : null}
             <TimePicker value={time} onChange={setTime} />
           </View>
@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: spacing.xs,
     alignSelf: 'stretch',
+    width: '100%',
   },
   titleInput: {
     fontFamily: FONT_FAMILY,

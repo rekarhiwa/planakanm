@@ -15,7 +15,6 @@ import { NowCard } from '../components/NowCard';
 import { OverdueDialog } from '../components/OverdueDialog';
 import { PlanRow } from '../components/PlanRow';
 import { SectionHeader } from '../components/SectionHeader';
-import { SnoozePicker } from '../components/SnoozePicker';
 import { UndoSnackbar } from '../components/UndoSnackbar';
 import { navigateToCreatePlan } from '../navigation/navigationRef';
 import type { RootStackParamList } from '../navigation';
@@ -27,7 +26,6 @@ import { useUIStore } from '../stores/uiStore';
 import { spacing, typography } from '../theme/colors';
 import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
-import type { SnoozeSelection } from '../domain/services/snoozeEngine';
 import {
   getGreetingKey,
   getPlanRemainingParts,
@@ -73,10 +71,7 @@ export function HomeScreen() {
   const isLoading = usePlanStore((s) => s.isLoading);
   const userName = useSettingsStore((s) => s.settings.userName);
 
-  const showSnoozeSheet = useUIStore((s) => s.showSnoozeSheet);
-  const snoozePlanId = useUIStore((s) => s.snoozePlanId);
   const openSnooze = useUIStore((s) => s.openSnooze);
-  const closeSnooze = useUIStore((s) => s.closeSnooze);
   const showOverdueDialog = useUIStore((s) => s.showOverdueDialog);
   const overduePlans = useUIStore((s) => s.overduePlans);
   const setOverdueDialog = useUIStore((s) => s.setOverdueDialog);
@@ -156,13 +151,6 @@ export function HomeScreen() {
       showUndo(t('common.deleted'));
     },
     [colors.primary, deletePlan, showUndo, t],
-  );
-
-  const handleSnoozeSelect = useCallback(
-    async (selection: SnoozeSelection) => {
-      if (snoozePlanId) await snoozePlan(snoozePlanId, selection);
-    },
-    [snoozePlanId, snoozePlan],
   );
 
   const overduePlan = overdueList[0] ?? (overduePlans.length > 0 ? plans.find((p) => p.id === overduePlans[0]) : undefined);
@@ -308,11 +296,6 @@ export function HomeScreen() {
 
       <FAB label={t('home.newPlan')} onPress={() => navigateToCreatePlan()} />
 
-      <SnoozePicker
-        visible={showSnoozeSheet}
-        onClose={closeSnooze}
-        onSelect={handleSnoozeSelect}
-      />
       <OverdueDialog
         visible={showOverdueDialog}
         planTitle={overduePlan?.title}

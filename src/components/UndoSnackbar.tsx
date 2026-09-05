@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 100,
-    left: spacing.lg,
-    right: spacing.lg,
+    start: spacing.lg,
+    end: spacing.lg,
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: spacing.lg,

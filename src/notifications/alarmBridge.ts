@@ -11,5 +11,6 @@ export function notifyAlarmReceived(planId: string): void {
 }
 
 export function isFullscreenReminder(reminderType: unknown): boolean {
-  return reminderType === 'alarm';
+  // Timed plan reminders are fullscreen alarms; only explicit "notification" stays soft.
+  return reminderType !== 'notification';
 }

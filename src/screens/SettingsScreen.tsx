@@ -18,7 +18,7 @@ import { useSettingsStore } from '../stores/settingsStore';
 import { useTheme } from '../theme/ThemeContext';
 import type { ThemeMode } from '../theme/colors';
 import { radius, spacing, typography } from '../theme/colors';
-import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
+import { contentDirectionStyle, layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
 import type { AppLanguage } from '../i18n';
 
 export function SettingsScreen() {
@@ -102,7 +102,7 @@ export function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, contentDirectionStyle()]}>
         <Text style={[styles.title, { color: colors.text }, rtl]}>{t('settings.title')}</Text>
 
         <AlarmPermissionsCard status={permissionStatus} onRefresh={refreshPermissions} />
@@ -133,12 +133,17 @@ export function SettingsScreen() {
 
         <SettingSection title={t('settings.language')} colors={colors} rtl={rtl}>
           <View style={[styles.chipRow, { flexDirection: layoutRow() }]}>
-            {(['ku', 'ar', 'en'] as AppLanguage[]).map((lang) => (
+            {([
+              { code: 'ku' as AppLanguage, label: 'کوردی' },
+              { code: 'en' as AppLanguage, label: 'English' },
+            ]).map((lang) => (
               <Chip
-                key={lang}
-                label={lang === 'ku' ? 'کوردی' : lang === 'ar' ? 'العربية' : 'English'}
-                selected={settings.language === lang}
-                onPress={() => setLanguage(lang)}
+                key={lang.code}
+                label={lang.label}
+                selected={settings.language === lang.code}
+                onPress={() => {
+                  void setLanguage(lang.code);
+                }}
               />
             ))}
           </View>

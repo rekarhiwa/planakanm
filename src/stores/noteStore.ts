@@ -53,7 +53,7 @@ async function syncNoteAlarm(note: Note, input: SaveNoteInput): Promise<Note | n
     date: input.alarmDate,
     time: formatTime24(input.alarmTime),
     hasTime: true,
-    reminderType: 'notification' as const,
+    reminderType: 'alarm' as const,
   };
 
   if (note.planId) {

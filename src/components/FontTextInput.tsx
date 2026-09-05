@@ -3,12 +3,14 @@ import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { TextInputProps, TextStyle } from 'react-native';
 
 import { FONT_FAMILY } from '../theme/fonts';
-import { getIsRTL } from '../theme/rtl';
+import { contentDirectionStyle, getIsRTL } from '../theme/rtl';
 
 interface FontTextInputProps extends TextInputProps {
   placeholder: string;
   placeholderColor: string;
   inputStyle?: TextStyle;
+  /** Keep numbers/phones/codes LTR inside an RTL UI. */
+  forceLtr?: boolean;
 }
 
 export const FontTextInput = forwardRef<TextInput, FontTextInputProps>(function FontTextInput(
@@ -20,11 +22,12 @@ export const FontTextInput = forwardRef<TextInput, FontTextInputProps>(function 
     value,
     multiline,
     textAlign: textAlignProp,
+    forceLtr = false,
     ...props
   },
   ref,
 ) {
-  const rtl = getIsRTL();
+  const rtl = getIsRTL() && !forceLtr;
   const textAlign = textAlignProp ?? (rtl ? 'right' : 'left');
   const writingDirection: 'rtl' | 'ltr' = rtl ? 'rtl' : 'ltr';
   const flatStyle = StyleSheet.flatten([style, inputStyle]) as TextStyle | undefined;
@@ -41,7 +44,7 @@ export const FontTextInput = forwardRef<TextInput, FontTextInputProps>(function 
       style={[
         styles.wrap,
         !multiline ? styles.wrapSingle : null,
-        rtl ? styles.wrapRtl : styles.wrapLtr,
+        forceLtr ? styles.wrapLtr : contentDirectionStyle(),
       ]}
     >
       {!hasValue ? (
@@ -86,9 +89,6 @@ const styles = StyleSheet.create({
     minHeight: 52,
     justifyContent: 'center',
   },
-  wrapRtl: {
-    direction: 'rtl',
-  },
   wrapLtr: {
     direction: 'ltr',
   },
@@ -108,8 +108,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     bottom: 0,
-    left: 0,
-    right: 0,
+    start: 0,
+    end: 0,
     zIndex: 1,
     textAlignVertical: 'center',
   },

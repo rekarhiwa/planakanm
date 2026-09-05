@@ -2,7 +2,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useDialogStore } from '../stores/dialogStore';
-import { layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { radius, spacing, typography } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -35,7 +35,7 @@ export function ConfirmDialog() {
           <Text style={[styles.title, { color: titleColor }, rtl]}>{options.title}</Text>
 
           {options.highlight ? (
-            <View style={[styles.highlight, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, flexDirection: layoutRow(), alignItems: layoutAlignEnd() }]}>
+            <View style={[styles.highlight, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, flexDirection: layoutRow(), alignItems: 'center' }]}>
               <View style={[styles.highlightDot, { backgroundColor: options.highlight.color }]} />
               <Text style={[styles.highlightLabel, { color: colors.text }, rtl]} numberOfLines={1}>
                 {options.highlight.label}
@@ -52,14 +52,14 @@ export function ConfirmDialog() {
               onPress={confirm}
               style={[styles.confirmBtn, { backgroundColor: confirmBg }]}
             >
-              <Text style={{ color: confirmTextColor, ...typography.label }}>
+              <Text style={[{ color: confirmTextColor, ...typography.label }, rtl]}>
                 {options.confirmLabel ?? (variant === 'alert' ? t('common.ok') : t('common.confirm'))}
               </Text>
             </Pressable>
 
             {variant === 'confirm' ? (
               <Pressable onPress={cancel} style={styles.cancelBtn}>
-                <Text style={{ color: colors.textSecondary, ...typography.label }}>
+                <Text style={[{ color: colors.textSecondary, ...typography.label }, rtl]}>
                   {options.cancelLabel ?? t('common.cancel')}
                 </Text>
               </Pressable>

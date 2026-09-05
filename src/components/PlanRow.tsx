@@ -3,7 +3,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 
 import type { Category, Plan } from '../domain/entities/types';
 import { radius, spacing, typography } from '../theme/colors';
-import { getIsRTL, layoutAlignEnd, layoutRow, rtlTextStyle } from '../theme/rtl';
+import { getIsRTL, layoutAlignEnd, layoutRow, ltrTextStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface PlanRowProps {
@@ -123,7 +123,7 @@ export function PlanRow({
       </View>
 
       {showTime && plan.hasTime && plan.time ? (
-        <Text style={[styles.time, { color: colors.primary }]}>{plan.time}</Text>
+        <Text style={[styles.time, { color: colors.primary }, ltrTextStyle()]}>{plan.time}</Text>
       ) : null}
       {!plan.hasTime ? <Text style={[styles.bullet, { color: colors.primary }]}>•</Text> : null}
 
