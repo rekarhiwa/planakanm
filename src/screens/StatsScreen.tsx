@@ -61,7 +61,7 @@ export function StatsScreen() {
   if (!stats) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[{ color: colors.text, textAlign: 'center', marginTop: 40 }, rtl]}>
+        <Text style={[{ color: colors.text, marginTop: 40 }, rtl]}>
           {t('common.loading')}
         </Text>
       </SafeAreaView>
@@ -211,9 +211,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   miniLabel: { ...typography.title, fontSize: 22 },
-  miniValue: { ...typography.caption, marginTop: spacing.xs, textAlign: 'center' },
+  miniValue: { ...typography.caption, marginTop: spacing.xs },
   sectionTitle: { ...typography.title, marginBottom: spacing.lg },
   chartContainer: { alignItems: 'center', marginBottom: spacing.xl },
   chartLabels: { gap: 40, marginTop: spacing.sm },
-  chartLabel: { ...typography.caption, width: 60, textAlign: 'center' },
+  chartLabel: { ...typography.caption, width: 60 },
 });

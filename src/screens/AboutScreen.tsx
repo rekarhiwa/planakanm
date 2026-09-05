@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from '../components/ScreenHeader';
 import type { SettingsStackParamList } from '../navigation';
 import { radius, spacing, typography } from '../theme/colors';
-import { ltrTextStyle, rtlTextStyle } from '../theme/rtl';
+import { layoutAlignStart, ltrTextStyle, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 const appIcon = require('../../assets/icon.png');
@@ -29,7 +29,7 @@ export function AboutScreen() {
       />
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.hero}>
+        <View style={[styles.hero, { alignItems: layoutAlignStart() }]}>
           <View style={[styles.iconWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Image source={appIcon} style={styles.icon} resizeMode="contain" />
           </View>
@@ -55,8 +55,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   hero: {
-    alignItems: 'center',
     gap: spacing.md,
+    width: '100%',
   },
   iconWrap: {
     width: 88,
@@ -75,15 +75,16 @@ const styles = StyleSheet.create({
   appName: {
     ...typography.display,
     fontSize: 24,
+    width: '100%',
   },
   description: {
     ...typography.body,
     lineHeight: 26,
-    textAlign: 'center',
-    maxWidth: 320,
+    width: '100%',
   },
   version: {
     ...typography.caption,
     marginTop: spacing.sm,
+    width: '100%',
   },
 });

@@ -52,7 +52,7 @@ export function SearchScreen() {
         ListEmptyComponent={
           query ? (
             <View style={styles.empty}>
-              <Text style={[{ color: colors.textSecondary, textAlign: 'center' }, rtl]}>
+              <Text style={[{ color: colors.textSecondary }, rtl]}>
                 {t('search.noResults')}
               </Text>
             </View>

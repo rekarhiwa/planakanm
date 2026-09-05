@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { getDayNameCompact, getTodayISO } from '../utils/dates';
 import { radius, spacing } from '../theme/colors';
 import { FONT_FAMILY } from '../theme/fonts';
+import { rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 import { useSettingsStore } from '../stores/settingsStore';
 
@@ -21,6 +22,7 @@ export function DateSelector({
   const { colors } = useTheme();
   const language = useSettingsStore((s) => s.settings.language);
   const today = getTodayISO();
+  const rtl = rtlTextStyle();
 
   const dates = Array.from({ length: daysCount }, (_, i) => {
     const d = addDays(new Date(), i - 3);
@@ -54,6 +56,7 @@ export function DateSelector({
               style={[
                 styles.dayName,
                 { color: isSelected ? colors.fabText : colors.textSecondary },
+                rtl,
               ]}
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -65,6 +68,7 @@ export function DateSelector({
               style={[
                 styles.dayNum,
                 { color: isSelected ? colors.fabText : colors.text },
+                rtl,
               ]}
             >
               {date.getDate()}
@@ -84,7 +88,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   item: {
-    alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.sm,
     borderRadius: radius.md,
@@ -97,12 +100,13 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY,
     fontSize: 9,
     lineHeight: 11,
-    textAlign: 'center',
+    width: '100%',
   },
   dayNum: {
     fontFamily: FONT_FAMILY,
     fontSize: 17,
     lineHeight: 20,
     fontWeight: '600',
+    width: '100%',
   },
 });

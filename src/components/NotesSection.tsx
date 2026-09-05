@@ -5,6 +5,7 @@ import type { Note } from '../domain/entities/types';
 import { NoteRow } from './NoteRow';
 import { SectionHeader } from './SectionHeader';
 import { radius, spacing, typography } from '../theme/colors';
+import { layoutAlignStart, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface NotesSectionProps {
@@ -26,6 +27,7 @@ export function NotesSection({
 }: NotesSectionProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const rtl = rtlTextStyle();
 
   const activeNotes = notes.filter((note) => !note.completed);
   const completedNotes = notes.filter((note) => note.completed);
@@ -38,13 +40,13 @@ export function NotesSection({
 
       <Pressable
         onPress={onAddNote}
-        style={[styles.addBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
+        style={[styles.addBtn, { borderColor: colors.border, backgroundColor: colors.surface, alignItems: layoutAlignStart() }]}
       >
-        <Text style={{ color: colors.primary, ...typography.label }}>+ {t('notes.add')}</Text>
+        <Text style={[{ color: colors.primary, ...typography.label }, rtl]}>+ {t('notes.add')}</Text>
       </Pressable>
 
       {notes.length === 0 ? (
-        <Text style={[styles.empty, { color: colors.textSecondary }]}>{t('notes.empty')}</Text>
+        <Text style={[styles.empty, { color: colors.textSecondary }, rtl]}>{t('notes.empty')}</Text>
       ) : (
         <>
           {activeNotes.map((note) => (
@@ -59,7 +61,7 @@ export function NotesSection({
 
           {completedNotes.length > 0 && (
             <>
-              <Text style={[styles.doneLabel, { color: colors.textSecondary }]}>
+              <Text style={[styles.doneLabel, { color: colors.textSecondary }, rtl]}>
                 {t('notes.completed')} ({completedNotes.length})
               </Text>
               {completedNotes.map((note) => (
@@ -90,12 +92,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderStyle: 'dashed',
     paddingVertical: spacing.md,
-    alignItems: 'center',
+    paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
   },
   empty: {
     ...typography.caption,
-    textAlign: 'center',
+    width: '100%',
     lineHeight: 20,
     paddingVertical: spacing.md,
   },

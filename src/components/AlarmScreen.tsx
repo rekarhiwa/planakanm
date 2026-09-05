@@ -188,14 +188,15 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     gap: spacing.md,
     paddingTop: spacing.xxl,
+    width: '100%',
   },
   badge: {
     fontFamily: FONT_FAMILY,
     fontSize: 13,
     letterSpacing: 1.2,
+    alignSelf: 'stretch',
   },
   time: {
     fontFamily: MONO_FONT,
@@ -203,20 +204,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 1,
     lineHeight: 48,
+    alignSelf: 'stretch',
   },
   title: {
     ...typography.display,
     fontSize: 28,
-    textAlign: 'center',
     lineHeight: 34,
     marginTop: spacing.sm,
     alignSelf: 'stretch',
   },
   subtitle: {
     ...typography.body,
-    textAlign: 'center',
     lineHeight: 22,
-    paddingHorizontal: spacing.lg,
     alignSelf: 'stretch',
   },
   actions: {

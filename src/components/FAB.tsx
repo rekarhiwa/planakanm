@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { radius, spacing, typography } from '../theme/colors';
+import { rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface FABProps {
@@ -12,6 +13,7 @@ interface FABProps {
 export function FAB({ label, onPress }: FABProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const rtl = rtlTextStyle();
 
   return (
     <Pressable
@@ -26,7 +28,7 @@ export function FAB({ label, onPress }: FABProps) {
         },
       ]}
     >
-      <Text style={[styles.label, { color: colors.fabText }]}>+ {label}</Text>
+      <Text style={[styles.label, { color: colors.fabText }, rtl]}>+ {label}</Text>
     </Pressable>
   );
 }

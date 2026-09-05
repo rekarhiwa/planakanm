@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.title,
-    textAlign: 'center',
   },
   highlight: {
     gap: spacing.sm,
@@ -106,7 +105,6 @@ const styles = StyleSheet.create({
   },
   message: {
     ...typography.body,
-    textAlign: 'center',
     lineHeight: 22,
   },
   actions: {

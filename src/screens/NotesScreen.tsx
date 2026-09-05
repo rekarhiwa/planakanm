@@ -13,7 +13,7 @@ import { useDialogStore } from '../stores/dialogStore';
 import { useNoteStore } from '../stores/noteStore';
 import { useUIStore } from '../stores/uiStore';
 import { spacing, typography } from '../theme/colors';
-import { layoutAlignEnd, rtlTextStyle } from '../theme/rtl';
+import { layoutAlignEnd, layoutAlignStart, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 export function NotesScreen() {
@@ -71,10 +71,10 @@ export function NotesScreen() {
         showsVerticalScrollIndicator={false}
       >
         {notes.length === 0 ? (
-          <View style={styles.empty}>
+          <View style={[styles.empty, { alignItems: layoutAlignStart() }]}>
             <Text style={styles.emptyIcon}>📝</Text>
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>{t('notes.emptyTitle')}</Text>
-            <Text style={[styles.emptyMessage, { color: colors.textSecondary }]}>{t('notes.empty')}</Text>
+            <Text style={[styles.emptyTitle, { color: colors.text }, rtl]}>{t('notes.emptyTitle')}</Text>
+            <Text style={[styles.emptyMessage, { color: colors.textSecondary }, rtl]}>{t('notes.empty')}</Text>
           </View>
         ) : (
           <NotesSection
@@ -124,11 +124,11 @@ const styles = StyleSheet.create({
   },
   empty: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xxl,
     paddingTop: spacing.xxl * 2,
     gap: spacing.sm,
+    width: '100%',
   },
   emptyIcon: {
     fontSize: 48,
@@ -136,11 +136,11 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typography.title,
-    textAlign: 'center',
+    width: '100%',
   },
   emptyMessage: {
     ...typography.body,
-    textAlign: 'center',
+    width: '100%',
     lineHeight: 22,
   },
 });

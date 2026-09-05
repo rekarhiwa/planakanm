@@ -115,7 +115,7 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
               },
             ]}
           >
-            <Text style={{ color: customMode === 'minutes' ? colors.fabText : colors.text, ...typography.label }}>
+            <Text style={{ color: customMode === 'minutes' ? colors.fabText : colors.text, ...typography.label, ...rtl }}>
               {t('snooze.byMinutes')}
             </Text>
           </Pressable>
@@ -129,7 +129,7 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
               },
             ]}
           >
-            <Text style={{ color: customMode === 'time' ? colors.fabText : colors.text, ...typography.label }}>
+            <Text style={{ color: customMode === 'time' ? colors.fabText : colors.text, ...typography.label, ...rtl }}>
               {t('snooze.byTime')}
             </Text>
           </Pressable>
@@ -137,7 +137,7 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
 
         {customMode === 'minutes' ? (
           <View style={styles.wheelArea}>
-            <Text style={[styles.wheelLabel, { color: colors.textSecondary }]}>
+            <Text style={[styles.wheelLabel, { color: colors.textSecondary }, rtl]}>
               {t('snooze.minutesLabel')}
             </Text>
             <ScrollWheel
@@ -165,7 +165,7 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
               onPress={handleCustomMinutes}
               style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.fabText, ...typography.label }}>{t('snooze.applyMinutes')}</Text>
+              <Text style={{ color: colors.fabText, ...typography.label, ...rtl }}>{t('snooze.applyMinutes')}</Text>
             </Pressable>
           </View>
         ) : (
@@ -175,7 +175,7 @@ export function SnoozePicker({ visible, onClose, onSelect, isOverdue }: SnoozePi
               onPress={handleCustomTime}
               style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.fabText, ...typography.label }}>{t('snooze.applyTime')}</Text>
+              <Text style={{ color: colors.fabText, ...typography.label, ...rtl }}>{t('snooze.applyTime')}</Text>
             </Pressable>
           </View>
         )}
@@ -191,12 +191,10 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.title,
-    textAlign: 'center',
     marginBottom: spacing.sm,
   },
   subtitle: {
     ...typography.body,
-    textAlign: 'center',
     marginBottom: spacing.lg,
   },
   grid: {
@@ -237,7 +235,6 @@ const styles = StyleSheet.create({
   },
   wheelLabel: {
     ...typography.caption,
-    textAlign: 'center',
     marginBottom: spacing.xs,
   },
   confirmBtn: {

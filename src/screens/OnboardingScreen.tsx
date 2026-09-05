@@ -7,7 +7,7 @@ import { requestAppPermissions } from '../permissions';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useUIStore } from '../stores/uiStore';
 import { radius, spacing, typography } from '../theme/colors';
-import { contentDirectionStyle, rtlTextStyle } from '../theme/rtl';
+import { contentDirectionStyle, layoutAlignStart, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 const FEATURE_STEPS = [
@@ -55,7 +55,7 @@ export function OnboardingScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }, contentDirectionStyle()]}>
-      <View style={styles.content}>
+      <View style={[styles.content, { alignItems: layoutAlignStart() }]}>
         {isProfileStep ? (
           <>
             <Text style={styles.icon}>👋</Text>
@@ -115,7 +115,7 @@ export function OnboardingScreen() {
         ]}
         disabled={isProfileStep && !name.trim()}
       >
-        <Text style={{ color: colors.fabText, ...typography.label }}>
+        <Text style={[{ color: colors.fabText, ...typography.label }, rtl]}>
           {isProfileStep && onboardingComplete
             ? t('common.save')
             : isLast
@@ -129,10 +129,10 @@ export function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'space-between', padding: spacing.xxl },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  content: { flex: 1, justifyContent: 'center', width: '100%' },
   icon: { fontSize: 64, marginBottom: spacing.xl },
-  title: { ...typography.display, fontSize: 28, textAlign: 'center', marginBottom: spacing.lg },
-  desc: { ...typography.body, textAlign: 'center', lineHeight: 24, paddingHorizontal: spacing.lg },
+  title: { ...typography.display, fontSize: 28, width: '100%', marginBottom: spacing.lg },
+  desc: { ...typography.body, width: '100%', lineHeight: 24 },
   nameInput: {
     width: '100%',
     marginTop: spacing.xl,

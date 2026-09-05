@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { radius, spacing, typography } from '../theme/colors';
-import { layoutRow } from '../theme/rtl';
+import { layoutRow, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface ChipProps {
@@ -14,6 +14,7 @@ interface ChipProps {
 export function Chip({ label, selected, onPress, color }: ChipProps) {
   const { colors } = useTheme();
   const accent = color ?? colors.primary;
+  const rtl = rtlTextStyle();
 
   return (
     <Pressable
@@ -32,6 +33,7 @@ export function Chip({ label, selected, onPress, color }: ChipProps) {
           style={[
             styles.label,
             { color: selected ? colors.fabText : colors.text },
+            rtl,
           ]}
         >
           {label}

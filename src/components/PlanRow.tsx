@@ -167,12 +167,10 @@ const styles = StyleSheet.create({
   time: {
     ...typography.label,
     width: 48,
-    textAlign: 'center',
   },
   bullet: {
     fontSize: 20,
     width: 48,
-    textAlign: 'center',
   },
   content: {
     flex: 1,

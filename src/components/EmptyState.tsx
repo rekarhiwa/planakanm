@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { radius, spacing, typography } from '../theme/colors';
-import { rtlTextStyle } from '../theme/rtl';
+import { layoutAlignStart, rtlTextStyle } from '../theme/rtl';
 import { useTheme } from '../theme/ThemeContext';
 
 interface EmptyStateProps {
@@ -15,7 +15,7 @@ export function EmptyState({ onCreatePress }: EmptyStateProps) {
   const rtl = rtlTextStyle();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { alignItems: layoutAlignStart() }]}>
       <Text style={styles.icon}>🎯</Text>
       <Text style={[styles.title, { color: colors.text }, rtl]}>{t('home.emptyTitle')}</Text>
       <Text style={[styles.subtitle, { color: colors.textSecondary }, rtl]}>
@@ -38,9 +38,9 @@ export function EmptyState({ onCreatePress }: EmptyStateProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.xxl,
+    width: '100%',
   },
   icon: {
     fontSize: 48,
@@ -48,12 +48,12 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.title,
-    textAlign: 'center',
+    width: '100%',
     marginBottom: spacing.sm,
   },
   subtitle: {
     ...typography.body,
-    textAlign: 'center',
+    width: '100%',
     marginBottom: spacing.xl,
   },
   button: {

@@ -33,6 +33,7 @@ function needsLayoutMirror(): boolean {
   return getIsRTL() !== I18nManager.isRTL;
 }
 
+/** Body/title text: right for Kurdish, left for English. */
 export function rtlTextStyle(): TextStyle {
   const rtl = getIsRTL();
   return {
@@ -41,10 +42,13 @@ export function rtlTextStyle(): TextStyle {
   };
 }
 
-/** LTR island for numbers, times, phones, URLs, codes. */
+/**
+ * Numbers/times keep LTR digit order, but sit on the reading-start edge
+ * (right in Kurdish, left in English).
+ */
 export function ltrTextStyle(): TextStyle {
   return {
-    textAlign: 'left',
+    textAlign: getIsRTL() ? 'right' : 'left',
     writingDirection: 'ltr',
   };
 }
@@ -72,8 +76,8 @@ export function layoutAlignStart(): FlexAlignType {
 }
 
 /**
- * Align children toward reading-end on the cross axis of a column.
- * @deprecated Prefer layoutAlignStart for reading-start alignment.
+ * Same as layoutAlignStart (reading-start).
+ * @deprecated Prefer layoutAlignStart.
  */
 export function layoutAlignEnd(): ViewStyle['alignItems'] {
   return layoutAlignStart();

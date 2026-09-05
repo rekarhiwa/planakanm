@@ -130,7 +130,7 @@ export function NoteEditorScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { borderBottomColor: colors.border, flexDirection: layoutRow() }]}>
         <Pressable onPress={() => { void handleBack(); }} hitSlop={12} style={styles.headerBtn}>
-          <Text style={[styles.headerAction, { color: colors.primary }]}>{t('notes.back')}</Text>
+          <Text style={[styles.headerAction, { color: colors.primary }, rtl]}>{t('notes.back')}</Text>
         </Pressable>
 
         <Pressable
@@ -148,7 +148,7 @@ export function NoteEditorScreen() {
         </Pressable>
 
         <Pressable onPress={() => { void handleBack(); }} hitSlop={12} style={styles.headerBtn}>
-          <Text style={[styles.headerAction, { color: colors.primary, fontWeight: '600' }]}>
+          <Text style={[styles.headerAction, { color: colors.primary, fontWeight: '600' }, rtl]}>
             {t('notes.save')}
           </Text>
         </Pressable>
@@ -309,7 +309,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY,
     fontSize: 20,
     fontWeight: '500',
-    textAlign: 'center',
     fontVariant: ['tabular-nums'],
   },
 });

@@ -83,7 +83,7 @@ export function PlanDetailScreen() {
   if (!plan) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[{ color: colors.text, textAlign: 'center', marginTop: 40 }, rtl]}>
+        <Text style={[{ color: colors.text, marginTop: 40 }, rtl]}>
           {t('common.loading')}
         </Text>
       </SafeAreaView>

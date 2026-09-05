@@ -34,7 +34,7 @@ export function ScreenHeader({ title, onBack, backLabel, rightAction }: ScreenHe
         <Text style={[styles.back, { color: colors.primary }, rtl]}>{chevron}</Text>
       </Pressable>
 
-      <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+      <Text style={[styles.title, { color: colors.text }, rtl]} numberOfLines={1}>
         {title}
       </Text>
 
@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
   title: {
     ...typography.title,
     flex: 1,
-    textAlign: 'center',
     fontSize: 17,
   },
 });

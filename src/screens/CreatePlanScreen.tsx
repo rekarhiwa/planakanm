@@ -114,7 +114,7 @@ export function CreatePlanScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { borderBottomColor: colors.border, flexDirection: layoutRow() }]}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={styles.headerBtn}>
-          <Text style={[styles.headerAction, { color: colors.primary }]}>{t('notes.back')}</Text>
+          <Text style={[styles.headerAction, { color: colors.primary }, rtl]}>{t('notes.back')}</Text>
         </Pressable>
         <Text style={[styles.headerTitle, { color: colors.text }, rtl]} numberOfLines={1}>
           {t('create.title')}
@@ -129,6 +129,7 @@ export function CreatePlanScreen() {
             style={[
               styles.headerAction,
               { color: colors.primary, fontWeight: '600', opacity: title.trim() ? 1 : 0.4 },
+              rtl,
             ]}
           >
             {t('create.addPlan')}
@@ -283,7 +284,6 @@ const styles = StyleSheet.create({
     ...typography.label,
     fontSize: 16,
     flex: 1,
-    textAlign: 'center',
   },
   headerAction: {
     ...typography.label,
@@ -340,7 +340,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '500',
     letterSpacing: 0.5,
-    textAlign: 'center',
     marginBottom: spacing.xs,
     fontVariant: ['tabular-nums'],
   },
